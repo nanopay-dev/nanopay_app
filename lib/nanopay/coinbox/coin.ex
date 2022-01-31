@@ -69,7 +69,7 @@ defmodule Nanopay.Coinbox.Coin do
   @doc """
   Returns a Coin built with the given parameters.
   """
-  @spec init(non_neg_integer(), derivation_path(), non_neg_integer()) :: Schema.t()
+  @spec init(atom(), derivation_path(), non_neg_integer()) :: Schema.t()
   def init(channel, path, satoshis \\ 0) do
     %__MODULE__{}
     |> changeset(%{channel: channel, path: path, satoshis: satoshis})

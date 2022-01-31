@@ -40,13 +40,13 @@ defmodule Nanopay.FiatWallet.Topup do
   def get_line_items(%__MODULE__{type: type} = topup) do
     Enum.map [:amount, :fee], fn line ->
       money = Map.get(topup, line)
-      {_, pence, _, _} = Money.to_integer_exp(money)
+      {_, pennies, _, _} = Money.to_integer_exp(money)
       %{
         quantity: 1,
         price_data: %{
           currency: to_string(money.currency),
           product_data: get_product_data(line, type),
-          unit_amount: pence
+          unit_amount: pennies
         }
       }
     end

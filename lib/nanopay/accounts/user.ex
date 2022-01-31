@@ -6,16 +6,16 @@ defmodule Nanopay.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Nanopay.Accounts.{Profile, KeyData}
-  #alias Nanopay.FiatWallet
-  #alias Nanopay.FiatWallet.Topup
+  alias Nanopay.FiatWallet
+  alias Nanopay.FiatWallet.Topup
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
     has_many :profiles, Profile
     embeds_one :key_data, KeyData
-    #has_many :fiat_txns, FiatWallet.Txn
-    #has_many :topups, Topup
+    has_many :fiat_txns, FiatWallet.Txn
+    has_many :topups, Topup
 
     field :email, :string
     field :password, :string, virtual: true

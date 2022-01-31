@@ -51,7 +51,13 @@ defmodule Nanopay.MixProject do
       {:plug_cowboy, "~> 2.5"},
 
       {:argon2_elixir, "~> 3.0"},
-      {:bsv, "~> 2.1"}
+      {:bsv, "~> 2.1"},
+      {:castore, "~> 0.1"},
+      {:ex_money, "~> 5.7"},
+      {:ex_money_sql, "~> 1.5"},
+      {:mint, "~> 1.4"},
+      {:stripity_stripe, "~> 2.12"},
+      {:tesla, "~> 1.4"}
     ]
   end
 

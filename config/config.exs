@@ -48,6 +48,16 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Money config
+config :ex_money,
+  default_cldr_backend: Nanopay.Cldr,
+  exchange_rates_cache_module: Nanopay.Currency.RatesCache,
+  exchange_rates_retrieve_every: 3600_000,
+  open_exchange_rates_app_id: "xXxXxXxXxXx"
+
+# Tesla config
+config :tesla, :adapter, Tesla.Adapter.Mint
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

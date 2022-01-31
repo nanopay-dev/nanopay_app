@@ -37,8 +37,7 @@ defmodule Nanopay.AccountsTest do
     end
 
     @tag :pending
-    test "register_user/1 with valid data returns user and profile" do
-    end
+    test "register_user/1 with valid data returns user and profile"
 
     test "register_user/1 with invalid data returns error changeset" do
       assert {:error, :user, %Ecto.Changeset{}, _} = Accounts.register_user(%{}, %{})

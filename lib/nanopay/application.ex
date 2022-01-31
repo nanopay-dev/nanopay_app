@@ -15,9 +15,13 @@ defmodule Nanopay.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Nanopay.PubSub},
       # Start the Endpoint (http/https)
-      NanopayWeb.Endpoint
-      # Start a worker by calling: Nanopay.Worker.start_link(arg)
-      # {Nanopay.Worker, arg}
+      NanopayWeb.Endpoint,
+      # Start private currency store, define BSV currency, and start exchange rate process
+      Cldr.Currency,
+      {Task, fn ->
+        Cldr.Currency.new(:XSV, alt_code: :BSV, name: "Bitcoin SV", digits: 8, symbol: "₿")
+      end},
+      Nanopay.Currency.CryptoRates
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

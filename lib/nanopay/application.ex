@@ -21,8 +21,21 @@ defmodule Nanopay.Application do
       {Task, fn ->
         Cldr.Currency.new(:XSV, alt_code: :BSV, name: "Bitcoin SV", digits: 8, symbol: "₿")
       end},
-      Nanopay.Currency.CryptoRates
+      Nanopay.Currency.CryptoRates,
+      # Crontab
+      Nanopay.Scheduler
     ]
+
+    # Append MAPI processes unless in TEST
+    children = unless Mix.env() == :test do
+      mapi_opts = Application.fetch_env!(:nanopay, :mapi)
+      children ++ [
+        {Nanopay.MAPI.Queue, mapi_opts},
+        {Nanopay.MAPI.Processor, mapi_opts}
+      ]
+    else
+      children
+    end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

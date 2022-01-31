@@ -18,6 +18,12 @@ config :nanopay, NanopayWeb.Endpoint,
   pubsub_server: Nanopay.PubSub,
   live_view: [signing_salt: "aks66R6V"]
 
+# Crypto config options - TODO annotate these
+config :nanopay,
+  coinbox_seed: "WcV7z1Xmg0MbVZU9eckHy1Fmeekx+zvJblbXL1OE3RwTNFhFNpZ9hY0Dkh5I0t/kMy9qAvZJCf4oUamUCEEVEw==",
+  master_key: "xXxXxXxXxXx",
+  encryption_key: "4iZVg76SSDAxlK00N24NUkH31agvm1TadcMDiySSZH4="
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
@@ -26,6 +32,22 @@ config :nanopay, NanopayWeb.Endpoint,
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
 config :nanopay, Nanopay.Mailer, adapter: Swoosh.Adapters.Local
+
+# Configure MAPI process
+config :nanopay, :mapi,
+  miner: :taal,
+  max_push_attempts: 3,
+  max_status_attempts: 20,
+  retry_push_after: 90,
+  retry_status_after: 300
+
+# Configure quantum jobs
+config :nanopay, Nanopay.Scheduler,
+  jobs: [
+    {"* * * * *",   {Nanopay.MAPI.Queue, :refresh, []}},
+    {"* * * * *",   {Nanopay.Coinbox.Manager, :split_coins, [:all]}},
+    {"* * * * *",   {Nanopay.Coinbox, :unlock_coins, [:all]}}
+  ]
 
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false

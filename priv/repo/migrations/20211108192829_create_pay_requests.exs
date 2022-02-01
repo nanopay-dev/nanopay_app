@@ -16,5 +16,7 @@ defmodule Nanopay.Repo.Migrations.CreatePayRequests do
     end
 
     create index(:pay_requests, [:status])
+    create index(:pay_requests, ["(encode(substring(sha256(id::text::bytea) FROM 1 FOR 4), 'hex'))"], name: :pay_requests_ref_index)
+    create index(:pay_requests, [:inserted_at])
   end
 end

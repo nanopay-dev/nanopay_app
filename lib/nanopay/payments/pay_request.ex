@@ -51,6 +51,27 @@ defmodule Nanopay.Payments.PayRequest do
   def get_total(%__MODULE__{amount: amount, fee: fee}, ccy),
     do: Money.add!(amount, fee) |> Money.to_currency!(ccy)
 
+  @doc """
+  Returns a hex encoded 4 byte reference of the Pay Request.
+
+  This is taken from the UUID and is considered "unique enough" within a
+  reasonably short time frame.
+  """
+  @spec get_ref(Schema.t()) :: String.t()
+  def get_ref(%__MODULE__{id: id}) do
+    <<ref::binary-size(4), _::binary>> = BSV.Hash.sha256(id)
+    Base.encode16(ref, case: :lower)
+  end
+
+  @doc """
+  Returns a Paymail address for the Pay Request.
+  """
+  @spec get_paymail(Schema.t()) :: String.t()
+  def get_paymail(%__MODULE__{} = pay_request) do
+    ref = get_ref(pay_request)
+    host = Application.fetch_env!(:nanopay, :paymail_host)
+    "pr-#{ ref }@#{ host }"
+  end
 
   # Generates a random keypath if it is blank
   defp gen_keypath(%{valid?: true} = changes) do

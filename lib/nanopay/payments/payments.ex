@@ -29,6 +29,30 @@ defmodule Nanopay.Payments do
   end
 
   @doc """
+  Gets a Pay request by it's short ref. Returns nil if no Pay Request exists.
+  """
+  @spec get_pay_request_by_ref(String.t()) :: PayRequest.t() | nil
+  def get_pay_request_by_ref(ref) do
+    PayRequest
+    |> where(fragment("encode(substring(sha256(id::text::bytea) FROM 1 FOR 4), 'hex') = ?", ^ref))
+    |> order_by(desc: :inserted_at)
+    |> Repo.one()
+  end
+
+  @doc """
+  Gets a Pay request by it's short ref and the given clauses.
+
+  Useful for only returning Pay Requests of a given status.
+  """
+  @spec get_pay_request_by_ref(String.t(), Enum.t()) :: PayRequest.t()
+  def get_pay_request_by_ref(ref, clauses) do
+    PayRequest
+    |> where(fragment("encode(substring(sha256(id::text::bytea) FROM 1 FOR 4), 'hex') = ?", ^ref))
+    |> order_by(desc: :inserted_at)
+    |> Repo.get_by(Enum.into(clauses, %{}))
+  end
+
+  @doc """
   Creates a Pay Requests with the given attributes.
   """
   @spec create_pay_request(map()) ::

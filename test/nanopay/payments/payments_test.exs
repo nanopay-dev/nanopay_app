@@ -30,6 +30,18 @@ defmodule Nanopay.PaymentsTest do
       assert Payments.get_pay_request(pay_request_id, status: :funded) == nil
     end
 
+    test "get_pay_request_by_ref/1 returns the pay request with given short ref" do
+      %{id: pay_request_id} = pr = pay_request_fixture()
+      ref = PayRequest.get_ref(pr)
+      assert %{id: ^pay_request_id} = Payments.get_pay_request_by_ref(ref)
+    end
+
+    test "get_pay_request_by_ref/1 returns the pay request with given short ref and clauses" do
+      %{id: pay_request_id} = pr = pay_request_fixture()
+      ref = PayRequest.get_ref(pr)
+      assert %{id: ^pay_request_id} = Payments.get_pay_request_by_ref(ref, status: :pending)
+    end
+
     test "create_pay_request/1 creates a new payment request" do
       assert {:ok, %PayRequest{}} = Payments.create_pay_request(%{
         description: "Test",

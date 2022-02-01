@@ -22,7 +22,8 @@ config :nanopay, NanopayWeb.Endpoint,
 config :nanopay,
   coinbox_seed: "WcV7z1Xmg0MbVZU9eckHy1Fmeekx+zvJblbXL1OE3RwTNFhFNpZ9hY0Dkh5I0t/kMy9qAvZJCf4oUamUCEEVEw==",
   master_key: "xXxXxXxXxXx",
-  encryption_key: "4iZVg76SSDAxlK00N24NUkH31agvm1TadcMDiySSZH4="
+  encryption_key: "4iZVg76SSDAxlK00N24NUkH31agvm1TadcMDiySSZH4=",
+  paymail_host: "nanopay.cash"
 
 # Configures the mailer
 #
@@ -49,9 +50,6 @@ config :nanopay, Nanopay.Scheduler,
     {"* * * * *",   {Nanopay.Coinbox, :unlock_coins, [:all]}}
   ]
 
-# Swoosh API client is needed for adapters other than SMTP.
-config :swoosh, :api_client, false
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.14.0",
@@ -62,20 +60,30 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
-
-# Use Jason for JSON parsing in Phoenix
-config :phoenix, :json_library, Jason
-
 # Money config
 config :ex_money,
   default_cldr_backend: Nanopay.Cldr,
   exchange_rates_cache_module: Nanopay.Currency.RatesCache,
   exchange_rates_retrieve_every: 3600_000,
   open_exchange_rates_app_id: "xXxXxXxXxXx"
+
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
+
+# Custom mime types
+config :mime, :types, %{
+  "application/bitcoinsv-payment" => ["bsv"],
+  "application/bitcoinsv-paymentack" => ["bsv"],
+  "application/bitcoinsv-paymentrequest" => ["bsv"]
+}
+
+# Use Jason for JSON parsing in Phoenix
+config :phoenix, :json_library, Jason
+
+# Swoosh API client is needed for adapters other than SMTP.
+config :swoosh, :api_client, false
 
 # Tesla config
 config :tesla, :adapter, Tesla.Adapter.Mint

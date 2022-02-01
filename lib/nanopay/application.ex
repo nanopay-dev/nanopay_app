@@ -16,20 +16,20 @@ defmodule Nanopay.Application do
       {Phoenix.PubSub, name: Nanopay.PubSub},
       # Start the Endpoint (http/https)
       NanopayWeb.Endpoint,
-      # Start private currency store, define BSV currency, and start exchange rate process
+      # Start private currency store and define BSV currency
       Cldr.Currency,
       {Task, fn ->
         Cldr.Currency.new(:XSV, alt_code: :BSV, name: "Bitcoin SV", digits: 8, symbol: "₿")
       end},
-      Nanopay.Currency.CryptoRates,
       # Crontab
       Nanopay.Scheduler
     ]
 
-    # Append MAPI processes unless in TEST
+    # Append exchange rate and MAPI processes unless in TEST
     children = unless Mix.env() == :test do
       mapi_opts = Application.fetch_env!(:nanopay, :mapi)
       children ++ [
+        Nanopay.Currency.CryptoRates,
         {Nanopay.MAPI.Queue, mapi_opts},
         {Nanopay.MAPI.Processor, mapi_opts}
       ]

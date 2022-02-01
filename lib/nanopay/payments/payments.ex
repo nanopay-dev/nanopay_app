@@ -65,6 +65,18 @@ defmodule Nanopay.Payments do
   end
 
   @doc """
+  Sets the specified status on the given Pay Request.
+  """
+  @spec set_pay_request_status(PayRequest.t(), atom()) ::
+    {:ok, PayRequest.t()} |
+    {:error, Ecto.Changeset.t()}
+  def set_pay_request_status(%PayRequest{} = pay_request, status) do
+    pay_request
+    |> PayRequest.status_changeset(status)
+    |> Repo.update()
+  end
+
+  @doc """
   Funds a Pay Request using the given user's Fiat Wallet.
 
   Performs an Ecto.Multi routine as follows:

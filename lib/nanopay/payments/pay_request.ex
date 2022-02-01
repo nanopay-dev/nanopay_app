@@ -20,6 +20,7 @@ defmodule Nanopay.Payments.PayRequest do
     field :amount, Money.Ecto.Composite.Type
     field :fee, Money.Ecto.Composite.Type
     field :base_rate, Money.Ecto.Composite.Type
+    field :completed_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
   end
@@ -35,6 +36,13 @@ defmodule Nanopay.Payments.PayRequest do
     |> validate_length(:description, max: 140)
     |> validate_number(:satoshis, greater_than_or_equal_to: 0)
     |> put_money_fields()
+  end
+
+  @doc false
+  def status_changeset(pay_request, status) do
+    pay_request
+    |> change(%{status: status})
+    |> put_completed_at()
   end
 
   @doc """
@@ -71,6 +79,19 @@ defmodule Nanopay.Payments.PayRequest do
     ref = get_ref(pay_request)
     host = Application.fetch_env!(:nanopay, :paymail_host)
     "pr-#{ ref }@#{ host }"
+  end
+
+  @doc """
+  TODO
+  """
+  def build_coins(%__MODULE__{keypath: keypath, amount: amount, fee: fee}) do
+    {:XSV, satoshis, -8, _} = Money.to_integer_exp(amount)
+    {:XSV, fee_sats, -8, _} = Money.to_integer_exp(fee)
+
+    [
+      Nanopay.Coinbox.Coin.init(:inbox, keypath, satoshis),
+      Nanopay.Coinbox.Coin.init(:used, "/f#{ keypath }", fee_sats)
+    ]
   end
 
   # Generates a random keypath if it is blank
@@ -110,5 +131,16 @@ defmodule Nanopay.Payments.PayRequest do
   end
 
   defp put_money_fields(changes), do: changes
+
+  # TODO
+  defp put_completed_at(changes) do
+    case get_field(changes, :status) do
+      :completed ->
+        now = DateTime.utc_now() |> DateTime.truncate(:second)
+        put_change(changes, :completed_at, now)
+      _ ->
+        changes
+    end
+  end
 
 end

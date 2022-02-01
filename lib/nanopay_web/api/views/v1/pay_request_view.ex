@@ -1,5 +1,6 @@
 defmodule NanopayWeb.API.V1.PayRequestView do
   use NanopayWeb, :view
+  alias Nanopay.Payments.PayRequest
 
   def render("show.json", %{pay_request: pay_request}) do
     %{
@@ -16,7 +17,7 @@ defmodule NanopayWeb.API.V1.PayRequestView do
       fee: pr.fee,
       description: pr.description,
       payment: %{
-        paymail: "TODO",
+        paymail: PayRequest.get_paymail(pr),
         bip270_url: "TODO",
         openpay_url: "TODO"
       },

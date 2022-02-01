@@ -11,6 +11,7 @@ defmodule Nanopay.Repo.Migrations.CreatePayRequests do
       add :fee, :money_with_currency
       add :base_rate, :money_with_currency
       add :ctx, :map
+      add :completed_at, :utc_datetime
 
       timestamps(type: :utc_datetime)
     end

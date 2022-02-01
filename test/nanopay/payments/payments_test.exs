@@ -55,6 +55,12 @@ defmodule Nanopay.PaymentsTest do
     test "create_pay_request/1 returns error with invalid params" do
       assert {:error, %Ecto.Changeset{}} = Payments.create_pay_request(%{})
     end
+
+    @tag :pending
+    test "set_pay_request_status/2 sets status on pay request"
+
+    @tag :pending
+    test "set_pay_request_status/2 sets timestamp if completed"
   end
 
   describe "fund_pay_request_with_user_wallet/2" do

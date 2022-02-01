@@ -39,6 +39,11 @@ defmodule Nanopay.Payments.PayRequestTest do
     end
   end
 
+  describe "status_changeset/2" do
+    @tag :pending
+    test "puts timestamp if completed"
+  end
+
   describe "get_total/2" do
     @tag :pending
     test "returns the total amount + fee of the pay request"

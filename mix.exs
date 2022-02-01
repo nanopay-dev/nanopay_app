@@ -53,11 +53,13 @@ defmodule Nanopay.MixProject do
       {:argon2_elixir, "~> 3.0"},
       {:bsv, "~> 2.1"},
       {:castore, "~> 0.1"},
+      {:cors_plug, "~> 2.0"},
       {:ex_money, "~> 5.7"},
       {:ex_money_sql, "~> 1.5"},
       {:gen_stage, "~> 1.1"},
       {:manic, "~> 0.1"},
       {:mint, "~> 1.4"},
+      {:open_api_spex, "~> 3.11"},
       {:quantum, "~> 3.4"},
       {:stripity_stripe, "~> 2.12"},
       {:tesla, "~> 1.4"}

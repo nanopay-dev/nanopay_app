@@ -14,16 +14,39 @@ defmodule NanopayWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :openapi do
+    plug CORSPlug, origin: "*"
+    plug OpenApiSpex.Plug.PutApiSpec, module: NanopayWeb.API.Spec
+  end
+
+  # Base API refers to internal private APIs
+  # TODO - authenticate
+  scope "/api/base", NanopayWeb.API.Base, as: :base_api do
+    pipe_through :api
+
+    resources "/fund", FundingController, singleton: true, only: [:show, :create]
+    resources "/stats", StatsController, only: [:index]
+  end
+
+  scope "/api" do
+    pipe_through :openapi
+
+    # Versioned API - public APIs
+    scope "/api/v1", NanopayWeb.API.V1, as: :v1_api do
+      resources "/pay_requests", PayRequestController, only: [:show, :create]
+      post "/pay_requests/:id/complete", PayRequestController, :complete
+    end
+
+    get "/openapi", OpenApiSpex.Plug.RenderSpec, []
+  end
+
   scope "/", NanopayWeb do
     pipe_through :browser
 
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", NanopayWeb do
-  #   pipe_through :api
-  # end
+  get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
 
   # Enables LiveDashboard only for development
   #

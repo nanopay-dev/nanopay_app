@@ -2,21 +2,22 @@ defmodule NanopayWeb.P2P.PaymailController do
   use NanopayWeb, :controller
   alias Nanopay.Payments
   alias Nanopay.Payments.PayRequest
-  #alias Presto.Transactions
-  #alias Presto.Payments.Invoice
 
   action_fallback :handle_error
 
   @doc """
-  TODO
+  GET /.well-known/bsvalias
+
+  Responds with Paymail capabilities.
   """
   def capabilities(conn, _params) do
     render(conn, "capabilities.json")
   end
 
-
   @doc """
-  TODO
+  POST /p2p/paymail/:paymail/dest
+
+  Responds with Paymail payment destination.
   """
   def payment_destination(conn, %{"paymail" => paymail, "satoshis" => satoshis}) do
     with {:ok, ref} <- parse_paymail(paymail),
@@ -27,9 +28,10 @@ defmodule NanopayWeb.P2P.PaymailController do
     end
   end
 
-
   @doc """
-  TODO
+  POST /p2p/paymail/:paymail/tx
+
+  Recieves a transaction satisfying a PayRequest and responds with the txid.
   """
   def transactions(conn, %{
     "paymail" => paymail,
@@ -50,15 +52,15 @@ defmodule NanopayWeb.P2P.PaymailController do
     end
   end
 
-  # TODO
+  # Parse the short ref fromt the paymail
   defp parse_paymail(paymail) do
-    case Regex.run(~r/\A(PR\-)?([^@\s]+)@([^@\s]+)\z/i, paymail) do
+    case Regex.run(~r/\A(pr\-)?([^@\s]+)@([^@\s]+)\z/i, paymail) do
       [^paymail, _pre, short_id, _domain] -> {:ok, short_id}
       _ -> :error
     end
   end
 
-  # TODO
+  # Verifies the given satoshis matches the PayRequest
   defp verify_amount(pay_request, satoshis) do
     {:XSV, total_sats, -8, _} = pay_request
     |> PayRequest.get_total()
@@ -67,7 +69,7 @@ defmodule NanopayWeb.P2P.PaymailController do
     if total_sats == satoshis, do: pay_request, else: :error
   end
 
-  # TODO
+  # Verifies the given satoshis matches the PayRequest
   defp verify_pay_request_id(pay_request, pay_request_id) do
     if pay_request_id == pay_request.id, do: pay_request, else: :error
   end

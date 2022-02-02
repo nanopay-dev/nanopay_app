@@ -43,7 +43,7 @@ defmodule NanopayWeb.P2P.PaymailControllerTest do
       assert is_list(outputs)
     end
 
-    test "renders not found when pay request already paid", %{
+    test "renders error when pay request already paid", %{
       conn: conn,
       pay_request: pay_request,
       satoshis: satoshis
@@ -55,7 +55,7 @@ defmodule NanopayWeb.P2P.PaymailControllerTest do
       |> json_response(:bad_request)
     end
 
-    test "renders not found when pay request cannot be found from paymail", %{
+    test "renders error when pay request cannot be found from paymail", %{
       conn: conn
     } do
       assert "Bad Request" == conn
@@ -132,6 +132,27 @@ defmodule NanopayWeb.P2P.PaymailControllerTest do
       assert %{status: :funded} = Nanopay.Repo.get!(PayRequest, pay_request.id)
     end
 
+    test "renders error if insufficient payment is given", %{
+      conn: conn,
+      pay_request: pay_request,
+      coins: coins
+    } do
+      # create a builder with 5 less sats
+      builder = Enum.reduce(coins, %BSV.TxBuilder{}, fn coin, builder ->
+        script = BSV.Script.from_binary!(coin.script, encoding: :hex)
+        contract = BSV.Contract.Raw.lock(coin.satoshis - 5, %{script: script})
+        BSV.TxBuilder.add_output(builder, contract)
+      end)
+
+      tx = BSV.TxBuilder.to_tx(builder)
+      rawtx = BSV.Tx.to_binary(tx, encoding: :hex)
+      paymail = PayRequest.get_paymail(pay_request)
+
+      assert "Bad Request" == conn
+      |> post(Routes.p2p_paymail_path(conn, :transactions, paymail), %{hex: rawtx, reference: pay_request.id})
+      |> json_response(:bad_request)
+    end
+
     test "renders error when paymail and invoice id mismatch", %{
       conn: conn,
       pay_request: pay_request,
@@ -161,27 +182,6 @@ defmodule NanopayWeb.P2P.PaymailControllerTest do
     } do
       paymail = PayRequest.get_paymail(pay_request)
       rawtx = "01000000012971e2a512999c3234b10b3a26906fb6391ab2a77c14a741fbefef45572ff20f010000006b4830450221008d61b486e016a0914a3d1c461b61b7ca75521b518c0490ae0dd800c73d9fc6880220313617cf73d8e4433dbe5da5f351155a9dd0311b2b98f91ccc204b4f49094b814121032d0d51f5480ac7a0c7078f06c6694d46a243d72c792af169ebffa814c4026b0fffffffff0263cb0100000000001976a914449606073363543094866674e86eb1ff3eb2432088ac6a1b8900000000001976a914f1b16ab6267189b67a722e882c5bb628cc07193d88ac00000000"
-      assert "Bad Request" == conn
-      |> post(Routes.p2p_paymail_path(conn, :transactions, paymail), %{hex: rawtx, reference: pay_request.id})
-      |> json_response(:bad_request)
-    end
-
-    test "renders error if insufficient payment is given", %{
-      conn: conn,
-      pay_request: pay_request,
-      coins: coins
-    } do
-      # create a builder with 5 less sats
-      builder = Enum.reduce(coins, %BSV.TxBuilder{}, fn coin, builder ->
-        script = BSV.Script.from_binary!(coin.script, encoding: :hex)
-        contract = BSV.Contract.Raw.lock(coin.satoshis - 5, %{script: script})
-        BSV.TxBuilder.add_output(builder, contract)
-      end)
-
-      tx = BSV.TxBuilder.to_tx(builder)
-      rawtx = BSV.Tx.to_binary(tx, encoding: :hex)
-      paymail = PayRequest.get_paymail(pay_request)
-
       assert "Bad Request" == conn
       |> post(Routes.p2p_paymail_path(conn, :transactions, paymail), %{hex: rawtx, reference: pay_request.id})
       |> json_response(:bad_request)

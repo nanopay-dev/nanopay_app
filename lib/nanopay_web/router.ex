@@ -16,7 +16,7 @@ defmodule NanopayWeb.Router do
 
   pipeline :p2p do
     plug CORSPlug, origin: "*"
-    plug :accepts, ["json"]
+    plug :accepts, ["bsv", "json"]
   end
 
   pipeline :openapi do
@@ -52,6 +52,9 @@ defmodule NanopayWeb.Router do
   # P2P endpoints
   scope "/p2p", NanopayWeb.P2P, as: :p2p do
     pipe_through :p2p
+
+    get "/bip270/payment/:id", Bip270Controller, :show
+    post "/bip270/payment/:id", Bip270Controller, :pay
 
     post "/paymail/:paymail/dest", PaymailController, :payment_destination
     post "/paymail/:paymail/tx", PaymailController, :transactions

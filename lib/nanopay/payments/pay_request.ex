@@ -82,15 +82,16 @@ defmodule Nanopay.Payments.PayRequest do
   end
 
   @doc """
-  TODO
+  Builds the expected coins required to satisfy the Pay Request.
   """
+  @spec build_coins(Schema.t()) :: list(Nanopay.Coinbox.Coin.t())
   def build_coins(%__MODULE__{keypath: keypath, amount: amount, fee: fee}) do
     {:XSV, satoshis, -8, _} = Money.to_integer_exp(amount)
     {:XSV, fee_sats, -8, _} = Money.to_integer_exp(fee)
 
     [
-      Nanopay.Coinbox.Coin.init(:inbox, keypath, satoshis),
-      Nanopay.Coinbox.Coin.init(:used, "/f#{ keypath }", fee_sats)
+      Nanopay.Coinbox.Coin.init(:used, keypath, satoshis),
+      Nanopay.Coinbox.Coin.init(:inbox, keypath, fee_sats)
     ]
   end
 

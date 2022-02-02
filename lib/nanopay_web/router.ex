@@ -14,6 +14,11 @@ defmodule NanopayWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :p2p do
+    plug CORSPlug, origin: "*"
+    plug :accepts, ["json"]
+  end
+
   pipeline :openapi do
     plug CORSPlug, origin: "*"
     plug OpenApiSpex.Plug.PutApiSpec, module: NanopayWeb.API.Spec
@@ -28,16 +33,28 @@ defmodule NanopayWeb.Router do
     resources "/stats", StatsController, only: [:index]
   end
 
-  scope "/api" do
+  # Versioned API - public APIs
+  scope "/api/v1", NanopayWeb.API.V1, as: :v1_api do
     pipe_through :openapi
 
-    # Versioned API - public APIs
-    scope "/api/v1", NanopayWeb.API.V1, as: :v1_api do
-      resources "/pay_requests", PayRequestController, only: [:show, :create]
-      post "/pay_requests/:id/complete", PayRequestController, :complete
-    end
+    resources "/pay_requests", PayRequestController, only: [:show, :create]
+    post "/pay_requests/:id/complete", PayRequestController, :complete
+  end
 
-    get "/openapi", OpenApiSpex.Plug.RenderSpec, []
+  # Generic one-off API routes
+  scope "/" do
+    pipe_through :api
+
+    get "/.well-known/bsvalias", NanopayWeb.P2P.PaymailController, :capabilities
+    get "/api/openapi", OpenApiSpex.Plug.RenderSpec, []
+  end
+
+  # P2P endpoints
+  scope "/p2p", NanopayWeb.P2P, as: :p2p do
+    pipe_through :p2p
+
+    post "/paymail/:paymail/dest", PaymailController, :payment_destination
+    post "/paymail/:paymail/tx", PaymailController, :transactions
   end
 
   scope "/", NanopayWeb do

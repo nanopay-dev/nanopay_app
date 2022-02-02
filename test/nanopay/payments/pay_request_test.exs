@@ -51,4 +51,19 @@ defmodule Nanopay.Payments.PayRequestTest do
     @tag :pending
     test "returns the total of the pay request with currency conversion"
   end
+
+  describe "get_ref/1" do
+    @tag :pending
+    test "returns a short reference based on the GUID"
+  end
+
+  describe "get_paymail/1" do
+    @tag :pending
+    test "returns a paymail address on the short ref"
+  end
+
+  describe "build_coins/1" do
+    @tag :pending
+    test "returns coins required to satisfy the payment request"
+  end
 end

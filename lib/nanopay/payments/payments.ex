@@ -120,6 +120,63 @@ defmodule Nanopay.Payments do
   end
 
   @doc """
+  TODO
+
+  1. build coins and validate they exist in txn
+  2. insert txn
+  3. insert coins
+  4. set pay request to funded
+  5. broadcast txn
+  6. sign utxo
+  """
+  def fund_pay_request_with_tx(%PayRequest{id: id} = pay_request, %BSV.Tx{} = tx) do
+    Multi.new()
+    # 1. build coins and validate they exist in txn
+    |> Multi.run(:coins, fn _repo, _changes ->
+      coins = PayRequest.build_coins(pay_request)
+      case Enum.all?(coins, & is_number(find_tx_vout(tx, &1))) do
+        true -> {:ok, coins}
+        false -> {:error, "Tx does not satisfy PayRequest"}
+      end
+    end)
+    # 2. insert txn
+    |> Multi.insert(:txn, fn _changes ->
+      tx
+      |> Coinbox.Txn.from_bsv_tx(status: :pushed)
+      |> Ecto.Changeset.change()
+    end)
+    # 3. insert coins
+    |> Multi.merge(fn %{txn: txn, coins: coins} ->
+      coins
+      |> Enum.map(& {Map.put(&1, :pay_request_id, id), find_tx_vout(tx, &1)})
+      |> Enum.reduce(Multi.new(), fn {coin, i}, multi ->
+        changeset = Coin.funding_changeset(coin, %{funding_txid: txn.txid, funding_vout: i})
+        Multi.insert(multi, {:output, i}, changeset)
+      end)
+    end)
+    # 4. set pay request to funded
+    |> Multi.update(:pay_request, Ecto.Changeset.change(pay_request, %{status: :funded}))
+    # 5. broadcast txn
+    # TODO
+    # 6. sign utxo
+    |> Multi.run(:signed_txin, fn _repo, changes ->
+      {_key, coin} = Enum.find(changes, fn {k, v} -> match?({:output, _}, k) and v.channel == :used end)
+      input = coin
+      |> Coin.to_bsv_utxo()
+      |> Unlocker.unlock(%{coin: coin}, PayCtx.to_opts(pay_request.ctx))
+      tx = TxBuilder.to_tx(%TxBuilder{inputs: [input]})
+      {:ok, hd(tx.inputs)}
+    end)
+    |> Repo.transaction()
+  end
+
+  defp find_tx_vout(tx, coin) do
+    Enum.find_index(tx.outputs, fn txout ->
+      BSV.Script.to_binary(txout.script, encoding: :hex) == coin.script and txout.satoshis >= coin.satoshis
+    end)
+  end
+
+  @doc """
   Updates a Pay Request as completed and updates the funding and spending coins.
 
   Performs an Ecto.Multi routine as follows:

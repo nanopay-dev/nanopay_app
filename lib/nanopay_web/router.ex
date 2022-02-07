@@ -5,7 +5,7 @@ defmodule NanopayWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {NanopayWeb.LayoutView, :root}
+    plug :put_root_layout, {NanopayWeb.App.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -58,6 +58,16 @@ defmodule NanopayWeb.Router do
 
     post "/paymail/:paymail/dest", PaymailController, :payment_destination
     post "/paymail/:paymail/tx", PaymailController, :transactions
+  end
+
+  scope "/app", NanopayWeb.App, as: :app do
+    pipe_through :browser
+
+    live_session :authenticated,
+      root_layout: {NanopayWeb.App.LayoutView, :root}
+    do
+      live "/", DashboardLive, :show
+    end
   end
 
   scope "/", NanopayWeb do

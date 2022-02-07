@@ -60,6 +60,9 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
+# Configure fontawesome
+config :ex_fontawesome, type: "solid"
+
 # Money config
 config :ex_money,
   default_cldr_backend: Nanopay.Cldr,
@@ -84,6 +87,18 @@ config :phoenix, :json_library, Jason
 
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
+
+# Configure tailwind
+config :tailwind,
+  version: "3.0.18",
+  default: [
+    args: ~w(
+      --config=tailwind.config.js
+      --input=css/app.css
+      --output=../priv/static/assets/app.css
+    ),
+    cd: Path.expand("../assets", __DIR__)
+  ]
 
 # Tesla config
 config :tesla, :adapter, Tesla.Adapter.Mint

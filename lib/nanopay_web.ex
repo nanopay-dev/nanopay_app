@@ -44,8 +44,7 @@ defmodule NanopayWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {NanopayWeb.LayoutView, "live.html"}
+      use Phoenix.LiveView, layout: {NanopayWeb.App.LayoutView, "live.html"}
 
       unquote(view_helpers())
     end

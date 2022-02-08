@@ -22,6 +22,7 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import Alpine from 'alpinejs'
 import topbar from "../vendor/topbar"
+import hooks from "./hooks"
 
 Alpine.start()
 
@@ -32,6 +33,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
       if (from._x_dataStack) { Alpine.clone(from, to) }
     }
   },
+  hooks,
   params: { _csrf_token: csrfToken },
 })
 

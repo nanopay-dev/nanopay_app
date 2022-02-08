@@ -60,6 +60,7 @@ defmodule NanopayWeb.Router do
     post "/paymail/:paymail/tx", PaymailController, :transactions
   end
 
+  # App routes
   scope "/app", NanopayWeb.App, as: :app do
     pipe_through :browser
 
@@ -67,6 +68,7 @@ defmodule NanopayWeb.Router do
       root_layout: {NanopayWeb.App.LayoutView, :root}
     do
       live "/", DashboardLive, :show
+      live "/wallet", WalletLive, :show
     end
   end
 

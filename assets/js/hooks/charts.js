@@ -64,7 +64,7 @@ var formatter = new Intl.NumberFormat('en-US', {
 
 export const BalanceChart = {
   mounted() {
-    const chart = new ApexCharts(this.el, {
+    this._chart = new ApexCharts(this.el, {
       chart: {
         type: 'area',
         height: 380,
@@ -168,6 +168,10 @@ export const BalanceChart = {
       }]
     })
 
-    chart.render()
+    this._chart.render()
+  },
+
+  destroyed() {
+    this._chart.destroy()
   }
 }

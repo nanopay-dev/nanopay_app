@@ -1,6 +1,5 @@
 defmodule NanopayWeb.App.SidebarComponent do
   use NanopayWeb, :component
-  import FontAwesome.LiveView, only: [icon: 1]
 
   # Navigation currently defined as a module attributes
   # Probbably best handled within a function
@@ -17,7 +16,7 @@ defmodule NanopayWeb.App.SidebarComponent do
         %{
           name: "Wallet",
           icon: "wallet",
-          path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
+          path: Routes.app_wallet_path(NanopayWeb.Endpoint, :show),
           current: false
         },
         %{

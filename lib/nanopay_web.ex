@@ -47,6 +47,7 @@ defmodule NanopayWeb do
       use Phoenix.LiveView, layout: {NanopayWeb.App.LayoutView, "live.html"}
 
       unquote(view_helpers())
+      unquote(liveview_helpers())
     end
   end
 
@@ -55,6 +56,7 @@ defmodule NanopayWeb do
       use Phoenix.LiveComponent
 
       unquote(view_helpers())
+      unquote(liveview_helpers())
     end
   end
 
@@ -63,6 +65,7 @@ defmodule NanopayWeb do
       use Phoenix.Component
 
       unquote(view_helpers())
+      import FontAwesome.LiveView
     end
   end
 
@@ -97,6 +100,14 @@ defmodule NanopayWeb do
       import NanopayWeb.ErrorHelpers
       import NanopayWeb.Gettext
       alias NanopayWeb.Router.Helpers, as: Routes
+    end
+  end
+
+  defp liveview_helpers do
+    quote do
+      import NanopayWeb.App.ButtonComponent
+      import NanopayWeb.App.PaginationComponent
+      import FontAwesome.LiveView
     end
   end
 

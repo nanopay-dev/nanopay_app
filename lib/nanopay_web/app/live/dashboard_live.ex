@@ -1,6 +1,13 @@
 defmodule NanopayWeb.App.DashboardLive do
   use NanopayWeb, :live_view
-  import FontAwesome.LiveView, only: [icon: 1]
+
+  @impl true
+  def mount(_params, _session, socket) do
+    socket = assign(socket, [
+      page_title: "Dashboard"
+    ])
+    {:ok, socket}
+  end
 
   @impl true
   def render(assigns) do
@@ -15,14 +22,8 @@ defmodule NanopayWeb.App.DashboardLive do
             <div id="balance-chart" phx-hook="BalanceChart" />
           </div>
           <div class="flex space-x-4">
-            <%= live_redirect to: "/", class: "inline-flex items-center justify-center mt-6 px-4 py-3 text-sm font-bold text-white bg-gradient-to-br from-green-500 to-cyan-600 hover:from-green-400 hover:to-cyan-500 rounded-md transition-colors" do %>
-              <.icon name="plus" class="fa w-4 h-4 mr-2" />
-              Topup $10
-            <% end %>
-            <%= live_redirect to: "/", class: "inline-flex items-center justify-center mt-6 px-4 py-3 text-sm font-bold text-white bg-gradient-to-br from-green-500 to-cyan-600 hover:from-green-400 hover:to-cyan-500 rounded-md transition-colors" do %>
-              <.icon name="plus" class="fa w-4 h-4 mr-2" />
-              Topup $20
-            <% end %>
+            <.topup_btn label="Topup $10" />
+            <.topup_btn label="Topup $20" />
           </div>
         </div>
 
@@ -32,7 +33,7 @@ defmodule NanopayWeb.App.DashboardLive do
             <ul class="space-y-4">
               <li>
                 <h3 class="text-sm font-medium text-gray-400">Today</h3>
-                <ul class="divide-y divide-white divide-opacity-10">
+                <ul class="divide-y divide-gray-700">
                   <li class="py-2 flex items-center">
                     <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-green-400 to-cyan-500">
                       <.icon name="credit-card" class="fa w-5 h-5 text-white" />
@@ -73,7 +74,7 @@ defmodule NanopayWeb.App.DashboardLive do
               </li>
               <li>
                 <h3 class="text-sm font-medium text-gray-400">Yesterday</h3>
-                <ul class="divide-y divide-white divide-opacity-10">
+                <ul class="divide-y divide-gray-700">
                   <li class="py-2 flex items-center">
                     <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
                       <.icon name="code" class="fa w-5 h-5 text-white" />
@@ -90,7 +91,7 @@ defmodule NanopayWeb.App.DashboardLive do
               </li>
               <li>
                 <h3 class="text-sm font-medium text-gray-400">Saturday, 5 February</h3>
-                <ul class="divide-y divide-white divide-opacity-10">
+                <ul class="divide-y divide-gray-700">
                   <li class="py-2 flex items-center">
                     <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
                       <.icon name="code" class="fa w-5 h-5 text-white" />

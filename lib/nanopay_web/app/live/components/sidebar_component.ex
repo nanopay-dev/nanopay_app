@@ -16,7 +16,7 @@ defmodule NanopayWeb.App.SidebarComponent do
         %{
           name: "Wallet",
           icon: "wallet",
-          path: Routes.app_wallet_path(NanopayWeb.Endpoint, :show),
+          path: Routes.app_wallet_path(NanopayWeb.Endpoint, :index),
           current: false
         },
         %{

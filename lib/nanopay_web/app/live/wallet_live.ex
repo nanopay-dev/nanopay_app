@@ -3,10 +3,24 @@ defmodule NanopayWeb.App.WalletLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    socket = assign(socket, [
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :index, _params) do
+    assign(socket, [
       page_title: "Wallet"
     ])
-    {:ok, socket}
+  end
+
+  defp apply_action(socket, :show, _params) do
+    assign(socket, [
+      page_title: "Txn"
+    ])
   end
 
   @impl true
@@ -19,7 +33,7 @@ defmodule NanopayWeb.App.WalletLive do
 
           <div class="mb-6 overflow-x-scroll">
             <table class="min-w-full">
-              <tbody class=" divide-y divide-gray-700">
+              <tbody class="divide-y divide-gray-700">
                 <%= for _i <- 1..2 do %>
                   <tr>
                     <td class="w-full pr-4 py-3 whitespace-nowrap">
@@ -38,9 +52,10 @@ defmodule NanopayWeb.App.WalletLive do
                       <div class="text-xs text-gray-500">$ 13.263</div>
                     </td>
                     <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" class="flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors">
+                      <%= live_patch to: Routes.app_wallet_path(@socket, :show, "foobar"),
+                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
                         <.icon name="search" class="fa h-4 w-4" />
-                      </a>
+                      <% end %>
                     </td>
                   </tr>
                   <tr>
@@ -60,9 +75,10 @@ defmodule NanopayWeb.App.WalletLive do
                       <div class="text-xs text-gray-500">$ 13.263</div>
                     </td>
                     <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" class="flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors">
+                      <%= live_patch to: Routes.app_wallet_path(@socket, :show, "foobar"),
+                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
                         <.icon name="search" class="fa h-4 w-4" />
-                      </a>
+                      <% end %>
                     </td>
                   </tr>
                   <tr>
@@ -82,9 +98,10 @@ defmodule NanopayWeb.App.WalletLive do
                       <div class="text-xs text-gray-500">$ 13.263</div>
                     </td>
                     <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" class="flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors">
+                      <%= live_patch to: Routes.app_wallet_path(@socket, :show, "foobar"),
+                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
                         <.icon name="search" class="fa h-4 w-4" />
-                      </a>
+                      <% end %>
                     </td>
                   </tr>
                   <tr>
@@ -104,9 +121,10 @@ defmodule NanopayWeb.App.WalletLive do
                       <div class="text-xs text-gray-500">$ 13.263</div>
                     </td>
                     <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" class="flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors">
+                      <%= live_patch to: Routes.app_wallet_path(@socket, :show, "foobar"),
+                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
                         <.icon name="search" class="fa h-4 w-4" />
-                      </a>
+                      <% end %>
                     </td>
                   </tr>
                   <tr>
@@ -126,9 +144,10 @@ defmodule NanopayWeb.App.WalletLive do
                       <div class="text-xs text-gray-500">$ 13.263</div>
                     </td>
                     <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" class="flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors">
+                      <%= live_patch to: Routes.app_wallet_path(@socket, :show, "foobar"),
+                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
                         <.icon name="search" class="fa h-4 w-4" />
-                      </a>
+                      <% end %>
                     </td>
                   </tr>
                 <% end %>
@@ -161,7 +180,69 @@ defmodule NanopayWeb.App.WalletLive do
           </div>
         </div>
       </div>
+
+      <%= if @live_action == :show do %>
+        <.txn_modal />
+      <% end %>
     </div>
+    """
+  end
+
+  defp txn_modal(assigns) do
+    ~H"""
+    <.live_component
+      module={NanopayWeb.App.ModalComponent}
+      id="txn.id-todo"
+      close-to={Routes.app_wallet_path(NanopayWeb.Endpoint, :index)}>
+
+      <div class="flex items-center">
+        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
+          <.icon name="code" class="fa w-5 h-5 text-white" />
+        </div>
+        <div class="flex-auto px-4">
+          <p class="text-base font-medium text-gray-100 truncate">Twetch post</p>
+          <p class="text-sm text-gray-400">7 February 2022</p>
+        </div>
+        <div class="flex-shrink-0">
+          <span class="text-lg font-medium text-rose-400">-$0.02</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 md:ml-14 border-t border-gray-700">
+        <div class="overflow-x-scroll">
+          <table class="min-w-full">
+            <tbody class="divide-y divide-gray-800">
+              <tr>
+                <td class="py-2 pr-4 text-xs text-gray-500">TXID</td>
+                <td class="py-2 pl-4 text-xs text-gray-400 text-right">
+                  <a href="#" class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
+                    770531b7&hellip;4a8a9c1f
+                    <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 text-xs text-gray-500">Address</td>
+                <td class="py-2 pl-4 text-xs text-gray-400 text-right">
+                  <a href="#" class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
+                    18VWHjMt4ixHddPPbs6righWTs3Sg2QNcn
+                    <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 text-xs text-gray-500">Amount (BSV)</td>
+                <td class="py-2 pl-4 text-xs text-gray-400 text-right">₿ 0.00327292</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 text-xs text-gray-500">Service fee (BSV)</td>
+                <td class="py-2 pl-4 text-xs text-gray-400 text-right">₿ 0.00068240</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </.live_component>
     """
   end
 

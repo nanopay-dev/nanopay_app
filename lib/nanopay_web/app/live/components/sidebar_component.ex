@@ -1,48 +1,46 @@
 defmodule NanopayWeb.App.SidebarComponent do
   use NanopayWeb, :component
 
-  # Navigation currently defined as a module attributes
-  # Probbably best handled within a function
-  def sections(), do: [
-    %{
+  # TODO -
+  def sidebar_sections(view) do
+    [%{
       name: "Main menu",
-      links: [
-        %{
+      links: [ %{
           name: "Dashboard",
           icon: "columns",
           path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
-          current: false
-        },
-        %{
+          current: view == NanopayWeb.App.DashboardLive
+        }, %{
           name: "Wallet",
           icon: "wallet",
           path: Routes.app_wallet_path(NanopayWeb.Endpoint, :index),
-          current: false
-        },
-        %{
+          current: view == NanopayWeb.App.WalletLive
+        }, %{
           name: "Payments",
           icon: "receipt",
-          path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
-          current: false
-        }
-      ]
-    },
-    %{
-      name: "Developer menu",
-      links: [
-        %{
-          name: "Apps",
+          path: Routes.app_payments_path(NanopayWeb.Endpoint, :index),
+          current: view == NanopayWeb.App.PaymentsLive
+        }, %{
+          name: "Connected apps",
           icon: "code",
           path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
           current: false
         }
       ]
-    }
-  ]
+    } ,%{
+      name: "Developer menu",
+      links: [
+        %{
+          name: "Your apps",
+          icon: "code",
+          path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
+          current: false
+        }
+      ]
+    }]
+  end
 
   def sidebar(assigns) do
-    assigns = Map.put(assigns, :sections, sections())
-
     ~H"""
     <div x-data="{isOpen: false}">
       <!-- bg overlay -->
@@ -180,7 +178,7 @@ defmodule NanopayWeb.App.SidebarComponent do
 
   defp nav_link(assigns) do
     ~H"""
-    <%= live_redirect to: @path, class: "group flex items-center px-2 py-2 text-sm font-medium rounded-md bg-white bg-opacity-0 transition-colors #{link_colors(@current)}" do %>
+    <%= live_redirect to: @path, class: "group flex items-center mb-0.5 px-2 py-2 text-sm font-medium rounded-md bg-white transition-colors #{link_colors(@current)}" do %>
       <span class={"inline-block w-5 mr-3 #{icon_colors(@current)}"}>
         <.icon name={@icon} class="fa w-5 h-5" />
       </span>
@@ -189,8 +187,8 @@ defmodule NanopayWeb.App.SidebarComponent do
     """
   end
 
-  defp link_colors(true), do: "bg-gray-900 text-white"
-  defp link_colors(false), do: "text-gray-300 hover:bg-opacity-5 hover:text-white"
+  defp link_colors(true), do: "text-white bg-opacity-10"
+  defp link_colors(false), do: "text-gray-300 bg-opacity-0 hover:bg-opacity-5 hover:text-white"
 
   defp icon_colors(true), do: "text-gray-300"
   defp icon_colors(false), do: "text-gray-500 group-hover:text-gray-200"

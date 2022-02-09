@@ -70,6 +70,8 @@ defmodule NanopayWeb.Router do
       live "/", DashboardLive, :show
       live "/wallet", WalletLive, :index
       live "/wallet/txn/:id", WalletLive, :show
+      live "/payments", PaymentsLive, :index
+      live "/payments/:id", PaymentsLive, :show
     end
   end
 

@@ -106,6 +106,7 @@ defmodule NanopayWeb do
   defp liveview_helpers do
     quote do
       import NanopayWeb.App.ButtonComponent
+      import NanopayWeb.App.FormComponent
       import NanopayWeb.App.PaginationComponent
       import FontAwesome.LiveView
     end

@@ -1,0 +1,26 @@
+<div class="min-h-screen flex flex-col px-4 md:px-8 py-6 md:py-12 lg:pt-24">
+  <p class="alert alert-info" role="alert"
+    phx-click="lv:clear-flash"
+    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+
+  <p class="alert alert-danger" role="alert"
+    phx-click="lv:clear-flash"
+    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <img
+      src={Routes.static_path(NanopayWeb.Endpoint, "/images/logo.png")}
+      class="h-12 w-auto mx-auto"
+      alt="Nanopay" />
+    <h2 class="mt-6 text-2xl font-light text-center"><%= assigns[:page_title] || "Nanopay" %></h2>
+    <%= if assigns[:subtitle] do %>
+      <p class="mt-4 text-center text-sm text-gray-300"><%= @subtitle %></p>
+    <% end %>
+  </div>
+
+  <div class="mt-12 mx-auto w-full max-w-md">
+    <div class="p-6 md:p-8 md:pb-10 bg-black bg-opacity-20 rounded-lg overflow-hidden">
+      <%= @inner_content %>
+    </div>
+  </div>
+</div>

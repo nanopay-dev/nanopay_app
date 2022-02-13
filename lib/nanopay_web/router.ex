@@ -5,7 +5,7 @@ defmodule NanopayWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {NanopayWeb.App.LayoutView, :root}
+    plug :put_root_layout, {NanopayWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -73,15 +73,26 @@ defmodule NanopayWeb.Router do
       live "/payments", PaymentsLive, :index
       live "/payments/:id", PaymentsLive, :show
     end
+
+    live_session :unauthenticated,
+      root_layout: {NanopayWeb.App.LayoutView, :root}
+    do
+      live "/register", RegistrationLive, :create
+      live "/login", SessionLive, :create
+    end
   end
 
   scope "/", NanopayWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    #get "/", PageController, :index
   end
 
-  get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
+  scope "/" do
+    pipe_through :browser
+    get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
+  end
+
 
   # Enables LiveDashboard only for development
   #

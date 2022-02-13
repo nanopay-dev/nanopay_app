@@ -51,6 +51,15 @@ defmodule NanopayWeb do
     end
   end
 
+  def live_view_auth do
+    quote do
+      use Phoenix.LiveView, layout: {NanopayWeb.App.LayoutView, "auth.html"}
+
+      unquote(view_helpers())
+      unquote(liveview_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent

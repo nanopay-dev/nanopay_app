@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@tailwindcss/forms": "^0.4.0",
     "alpinejs": "^3.8.1",
     "apexcharts": "^3.33.0",
     "phoenix": "file:../deps/phoenix",

@@ -7,8 +7,8 @@ import { appApi } from '../util/api'
  */
 Alpine.data('SessionForm', _ => {
   return {
-    email: null,
-    password: null,
+    email: '',
+    password: '',
 
     /**
      * Submit form handler.

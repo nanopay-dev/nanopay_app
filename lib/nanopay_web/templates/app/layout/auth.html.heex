@@ -5,14 +5,6 @@
   data-skey={@session_key}
   phx-hook="AppWrap">
 
-  <p class="alert alert-info" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
-
-  <p class="alert alert-danger" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
-
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
     <img
       src={Routes.static_path(NanopayWeb.Endpoint, "/images/logo.png")}
@@ -29,4 +21,8 @@
       <%= @inner_content %>
     </div>
   </div>
+
+  <.notifications let={{type, message}} notifications={Map.take(@flash, ["success", "info", "error"])}>
+    <.notify type={ type } message={ message } />
+  </.notifications>
 </div>

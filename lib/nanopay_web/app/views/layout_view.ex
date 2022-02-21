@@ -1,6 +1,7 @@
 defmodule NanopayWeb.App.LayoutView do
   use NanopayWeb, :view
   import NanopayWeb.App.SidebarComponent
+  import NanopayWeb.App.NotificationComponent
 
   # Phoenix LiveDashboard is available only in development by default,
   # so we instruct Elixir to not warn if the dashboard route is missing.

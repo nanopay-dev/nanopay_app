@@ -1,4 +1,10 @@
-<div class="min-h-screen flex flex-col px-4 md:px-8 py-6 md:py-12 lg:pt-24">
+<div
+  id="app-wrap"
+  class="min-h-screen flex flex-col px-4 md:px-8 py-6 md:py-12 lg:pt-24"
+  data-mkey={@master_pubkey}
+  data-skey={@session_key}
+  phx-hook="AppWrap">
+
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="info"><%= live_flash(@flash, :info) %></p>

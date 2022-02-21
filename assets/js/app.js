@@ -16,18 +16,20 @@
 //
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
-import "phoenix_html"
+import 'phoenix_html'
 // Establish Phoenix Socket and LiveView configuration.
-import {Socket} from "phoenix"
-import {LiveSocket} from "phoenix_live_view"
+import {Socket} from 'phoenix'
+import {LiveSocket} from 'phoenix_live_view'
 import Alpine from 'alpinejs'
-import topbar from "../vendor/topbar"
-import hooks from "./hooks"
+import topbar from '../vendor/topbar'
+import hooks from './hooks'
+import './components'
+import './store'
 
 Alpine.start()
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {
+let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+let liveSocket = new LiveSocket('/live', Socket, {
   dom: {
     onBeforeElUpdated(from, to) {
       if (from._x_dataStack) { Alpine.clone(from, to) }
@@ -38,9 +40,9 @@ let liveSocket = new LiveSocket("/live", Socket, {
 })
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
-window.addEventListener("phx:page-loading-start", info => topbar.show())
-window.addEventListener("phx:page-loading-stop", info => topbar.hide())
+topbar.config({barColors: {0: '#29d'}, shadowColor: 'rgba(0, 0, 0, .3)'})
+window.addEventListener('phx:page-loading-start', info => topbar.show())
+window.addEventListener('phx:page-loading-stop', info => topbar.hide())
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()

@@ -150,12 +150,15 @@ defmodule NanopayWeb.App.SidebarComponent do
             </a>
           </div>
           <div class="py-1">
-            <a class="flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5 cursor-pointer">
+            <%= link to: Routes.app_auth_path(NanopayWeb.Endpoint, :delete),
+              method: :delete,
+              class: "flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5"
+            do %>
               <span class="inline-block w-4 mr-3 ">
                 <.icon name="sign-out-alt" class="fa w-4 h-4" />
               </span>
               Sign out
-            </a>
+            <% end %>
           </div>
         </div>
       </div>

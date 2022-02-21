@@ -2,7 +2,7 @@ defmodule NanopayWeb.Router do
   use NanopayWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
+    plug :accepts, ["html", "json"]
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, {NanopayWeb.LayoutView, :root}
@@ -12,6 +12,14 @@ defmodule NanopayWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
+
+  pipeline :app do
+    plug NanopayWeb.App.UserTokenPlug
+  end
+
+  pipeline :app_auth do
+    plug NanopayWeb.App.RequireUserPlug
   end
 
   pipeline :p2p do
@@ -60,11 +68,15 @@ defmodule NanopayWeb.Router do
     post "/paymail/:paymail/tx", PaymailController, :transactions
   end
 
-  # App routes
+  # App routes - authenticated
   scope "/app", NanopayWeb.App, as: :app do
-    pipe_through :browser
+    pipe_through [:browser, :app, :app_auth]
+
+    delete "/auth", AuthController, :delete
 
     live_session :authenticated,
+      session: {NanopayWeb.App.Auth, :get_auth_session, []},
+      on_mount: NanopayWeb.App.AppLive,
       root_layout: {NanopayWeb.App.LayoutView, :root}
     do
       live "/", DashboardLive, :show
@@ -73,8 +85,17 @@ defmodule NanopayWeb.Router do
       live "/payments", PaymentsLive, :index
       live "/payments/:id", PaymentsLive, :show
     end
+  end
+
+  # App routes - non authenticated
+  scope "/app", NanopayWeb.App, as: :app do
+    pipe_through [:browser, :app]
+
+    post "/auth", AuthController, :create
 
     live_session :unauthenticated,
+      session: {NanopayWeb.App.Auth, :get_auth_session, []},
+      on_mount: NanopayWeb.App.AppLive,
       root_layout: {NanopayWeb.App.LayoutView, :root}
     do
       live "/register", RegistrationLive, :create

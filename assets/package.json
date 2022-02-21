@@ -4,12 +4,17 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@kingshott/iodine": "^7.0.1",
     "@tailwindcss/forms": "^0.4.0",
     "alpinejs": "^3.8.1",
     "apexcharts": "^3.33.0",
+    "axios": "^0.26.0",
+    "bsv": "^2.0.10",
+    "buffer": "^6.0.3",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
-    "phoenix_live_view": "file:../deps/phoenix_live_view"
+    "phoenix_live_view": "file:../deps/phoenix_live_view",
+    "prando": "^6.0.1"
   },
   "devDependencies": {}
 }

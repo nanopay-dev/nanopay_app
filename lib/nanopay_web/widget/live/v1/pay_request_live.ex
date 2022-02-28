@@ -1,6 +1,7 @@
 defmodule NanopayWeb.Widget.V1.PayRequestLive do
   use NanopayWeb, :live_view_widget
   alias Nanopay.Payments
+  alias Nanopay.Payments.PayRequest
 
   @pay_methods [
     %{name: "Nanopay", value: "nanopay", protocols: ["nanopay"]},
@@ -68,7 +69,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
 
       <div class="p-4">
         <.pay_summary class="mb-6" pay_request={@pay_request} />
-        <.pay_method pay_method={@pay_method} protocol={@pay_protocol} />
+        <.pay_method pay_request={@pay_request} pay_method={@pay_method} protocol={@pay_protocol} />
       </div>
 
       <div class="px-4 pb-4 text-center">
@@ -220,7 +221,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         </div>
       <% end %>
 
-      <.pay_method_ui protocol={@protocol} />
+      <.pay_method_ui pay_request={@pay_request} protocol={@protocol} />
     </div>
     """
   end
@@ -280,13 +281,14 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     assigns = Map.put(assigns, :component_id, "btn-#{:rand.uniform(100000)}")
     ~H"""
     <div class="flex flex-col items-center justify-center h-48">
-
-      <p class="text-xs text-slate-400 text-center">Swipe to confirm payment</p>
       <button
-        class="mt-4 text-xs px-2 py-1 bg-gray-400 text-white rounded"
+        class="inline-flex items-center justify-center w-64 mb-4 px-4 py-3 text-sm font-bold text-gray-100 bg-gradient-to-br from-green-500 to-cyan-600 hover:from-green-400 hover:to-cyan-500 rounded-md transition-colors"
         phx-click="fund">
-        Tap here actually
+        <.icon name="dollar-sign" class="fa h-4 w-4 mr-1" />
+        Pay
       </button>
+
+      <p class="text-xs text-slate-400 text-center">Tap to confirm payment</p>
     </div>
     """
   end
@@ -298,7 +300,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         id="pay-bip270"
         class="mb-4 p-2 mx-auto bg-slate-100 rounded"
         phx-hook="QrCode"
-        data-url={"https://p2p.nanopay.cash/bip270/pr-1"}>
+        data-url={Routes.p2p_bip270_url(NanopayWeb.Endpoint, :show, @pay_request.id)}>
       </div>
       <p class="text-xs text-slate-400 text-center">Scan to confirm payment</p>
     </div>
@@ -312,7 +314,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         id="pay-paymail"
         class="mb-4 p-2 mx-auto bg-slate-100 rounded"
         phx-hook="QrCode"
-        data-url={"https://p2p.nanopay.cash/bip270/pr-1"}>
+        data-url={PayRequest.get_paymail(@pay_request)}>
       </div>
       <p class="text-xs text-slate-400 text-center">Scan to confirm payment</p>
     </div>
@@ -323,17 +325,18 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     ~H"""
     <div class="flex flex-col items-center justify-center h-48">
       <div class="relative h-12 mb-8">
-        <div class="absolute z-0 top-0 left-0 right-0">
-          <svg class="animate-spin h-6 w-6 mt-2 mx-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+        <div class="absolute z-0 inset-0 flex justify-center pt-2">
+          <div class="h-7 w-7 animate-spin">
+            <.icon name="circle-notch" class="fa h-7 w-7 text-blue-400" />
+          </div>
         </div>
 
         <div
           id="pay-mb"
-          class="relative mx-auto z-10 translate-x-11"
-          phx-hook="MoneyButton"></div>
+          class="relative mx-auto z-0 translate-x-11"
+          phx-hook="MoneyButton"
+          data-amount={PayRequest.get_total(@pay_request) |> Money.to_decimal()}
+          data-paymail={PayRequest.get_paymail(@pay_request)} />
       </div>
       <p class="text-xs text-slate-400 text-center">Swipe to confirm payment</p>
     </div>
@@ -344,17 +347,18 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     ~H"""
     <div class="flex flex-col items-center justify-center h-48">
       <div class="relative h-12 mb-8">
-        <div class="absolute z-0 top-0 left-0 right-0">
-          <svg class="animate-spin h-6 w-6 mt-2 mx-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+        <div class="absolute z-0 inset-0 flex justify-center pt-2">
+          <div class="h-7 w-7 animate-spin">
+            <.icon name="circle-notch" class="fa h-7 w-7 text-blue-400" />
+          </div>
         </div>
 
         <div
           id="pay-relay"
-          class="relative mx-auto z-10"
-          phx-hook="RelayOne"></div>
+          class="relative mx-auto z-0"
+          phx-hook="RelayOne"
+          data-amount={PayRequest.get_total(@pay_request) |> Money.to_decimal()}
+          data-paymail={PayRequest.get_paymail(@pay_request)} />
       </div>
       <p class="text-xs text-slate-400 text-center">Swipe to confirm payment</p>
     </div>

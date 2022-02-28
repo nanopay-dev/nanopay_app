@@ -6,12 +6,17 @@ import Alpine from 'alpinejs'
 export const MoneyButton = {
   async mounted() {
     const mb = await Alpine.store('libs').get('moneybutton')
+    const { amount, paymail } = this.el.dataset
 
     mb.render(this.el, {
-      to: 'libs@moneybutton.com',
-      amount: 0.00100000,
+      to: paymail,
+      amount: amount,
       currency: 'BSV',
-      label: 'Send payment'
+      label: 'Send payment',
+      onPayment(payment) {
+        // todo - post rawtx to liveview
+        console.log(payment)
+      }
     })
   }
 }

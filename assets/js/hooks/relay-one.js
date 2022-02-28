@@ -6,12 +6,17 @@ import Alpine from 'alpinejs'
 export const RelayOne = {
   async mounted() {
     const rx = await Alpine.store('libs').get('relayone')
+    const { amount, paymail } = this.el.dataset
 
     rx.render(this.el, {
-      to: 'libs@moneybutton.com',
-      amount: 0.00100000,
+      to: paymail,
+      amount: amount,
       currency: 'BSV',
-      label: 'Send payment'
+      label: 'Send payment',
+      onPayment(payment) {
+        // todo - post rawtx to liveview
+        console.log(payment)
+      }
     })
   }
 }

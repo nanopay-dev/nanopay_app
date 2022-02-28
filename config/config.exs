@@ -55,7 +55,7 @@ config :esbuild,
   version: "0.14.0",
   default: [
     args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+      ~w(js/app.js js/widget.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
@@ -67,7 +67,7 @@ config :ex_fontawesome, type: "solid"
 config :ex_money,
   default_cldr_backend: Nanopay.Cldr,
   exchange_rates_cache_module: Nanopay.Currency.RatesCache,
-  exchange_rates_retrieve_every: 3600_000,
+  exchange_rates_retrieve_every: 36_000_000, #3600_000,
   open_exchange_rates_app_id: "xXxXxXxXxXx"
 
 # Configures Elixir's Logger

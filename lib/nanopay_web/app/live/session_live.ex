@@ -2,11 +2,6 @@ defmodule NanopayWeb.App.SessionLive do
   use NanopayWeb, :live_view_auth
 
   @impl true
-  def mount(_params, %{"current_user" => _user}, socket) do
-    socket = push_redirect(socket, to: Routes.app_dashboard_path(socket, :show))
-    {:ok, socket}
-  end
-
   def mount(_params, _session, socket) do
     socket = assign(socket, [
       page_title: "Sign in to your account",

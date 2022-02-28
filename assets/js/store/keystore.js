@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs'
 import { Buffer } from 'buffer'
 import { Bn, Bip39, Ecies, KeyPair, PubKey, Point } from 'bsv/dist/bsv.bundle'
-import { decrypt, encrypt, toKey, randBytes, sha256 } from './util/crypto'
+import { decrypt, encrypt, toKey, randBytes, sha256 } from '../util/crypto'
 
 /**
  * Appkey store

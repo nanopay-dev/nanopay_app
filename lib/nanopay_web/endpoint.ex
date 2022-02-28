@@ -12,6 +12,10 @@ defmodule NanopayWeb.Endpoint do
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
+  # Disable CORS
+  # TODO - wrap in a custom plug the only applies this to api and p2p routes
+  plug CORSPlug, origin: "*"
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phx.digest

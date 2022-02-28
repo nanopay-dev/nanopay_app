@@ -1,5 +1,7 @@
 defmodule NanopayWeb.App.AppLive do
   import Phoenix.LiveView
+  alias NanopayWeb.Router.Helpers, as: Routes
+  alias Nanopay.Accounts.User
   alias BSV.{PrivKey, PubKey}
 
   def on_mount(:default, _params, session, socket) do
@@ -16,4 +18,16 @@ defmodule NanopayWeb.App.AppLive do
 
     {:cont, socket}
   end
+
+  def on_mount(:ensure_user, params, %{"current_user" => %User{} = user} = session, socket),
+    do: on_mount(:default, params, session, assign(socket, :current_user, user))
+
+  def on_mount(:ensure_user, _params, _session, socket),
+    do: {:halt, push_redirect(socket, to: Routes.app_session_path(socket, :create))}
+
+  def on_mount(:ensure_no_user, _params, %{"current_user" => %User{}} = _session, socket),
+    do: {:halt, push_redirect(socket, to: Routes.app_dashboard_path(socket, :show))}
+
+  def on_mount(:ensure_no_user, params, session, socket),
+    do: on_mount(:default, params, session, socket)
 end

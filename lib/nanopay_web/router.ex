@@ -23,12 +23,14 @@ defmodule NanopayWeb.Router do
   end
 
   pipeline :p2p do
-    plug CORSPlug, origin: "*"
     plug :accepts, ["bsv", "json"]
   end
 
+  pipeline :widget do
+    plug :delete_resp_header, "x-frame-options"
+  end
+
   pipeline :openapi do
-    plug CORSPlug, origin: "*"
     plug OpenApiSpex.Plug.PutApiSpec, module: NanopayWeb.API.Spec
   end
 
@@ -76,7 +78,7 @@ defmodule NanopayWeb.Router do
 
     live_session :authenticated,
       session: {NanopayWeb.App.Auth, :get_auth_session, []},
-      on_mount: NanopayWeb.App.AppLive,
+      on_mount: {NanopayWeb.App.AppLive, :ensure_user},
       root_layout: {NanopayWeb.App.LayoutView, :root}
     do
       live "/", DashboardLive, :show
@@ -95,11 +97,23 @@ defmodule NanopayWeb.Router do
 
     live_session :unauthenticated,
       session: {NanopayWeb.App.Auth, :get_auth_session, []},
-      on_mount: NanopayWeb.App.AppLive,
+      on_mount: {NanopayWeb.App.AppLive, :ensure_no_user},
       root_layout: {NanopayWeb.App.LayoutView, :root}
     do
       live "/register", RegistrationLive, :create
       live "/login", SessionLive, :create
+    end
+  end
+
+  scope "/widget/v1", NanopayWeb.Widget.V1, as: :widget do
+    pipe_through [:browser, :widget]
+
+    live_session :default,
+      session: {NanopayWeb.App.Auth, :get_auth_session, []},
+      on_mount: NanopayWeb.App.AppLive,
+      root_layout: {NanopayWeb.Widget.LayoutView, :root}
+    do
+      live "/pay_requests/:id", PayRequestLive, :show
     end
   end
 

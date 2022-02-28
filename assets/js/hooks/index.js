@@ -1,5 +1,8 @@
 import Alpine from 'alpinejs'
 import { BalanceChart } from './charts'
+import { MoneyButton } from './money-button'
+import { RelayOne } from './relay-one'
+import { QrCode } from './qr-code'
 
 export default {
   /**
@@ -24,5 +27,8 @@ export default {
     }
   },
   
-  BalanceChart
+  BalanceChart,
+  MoneyButton,
+  RelayOne,
+  QrCode
 }

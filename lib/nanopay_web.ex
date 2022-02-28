@@ -60,6 +60,15 @@ defmodule NanopayWeb do
     end
   end
 
+  def live_view_widget do
+    quote do
+      use Phoenix.LiveView, layout: {NanopayWeb.Widget.LayoutView, "live.html"}
+
+      unquote(view_helpers())
+      unquote(widget_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent
@@ -117,6 +126,12 @@ defmodule NanopayWeb do
       import NanopayWeb.App.ButtonComponent
       import NanopayWeb.App.FormComponent
       import NanopayWeb.App.PaginationComponent
+      import FontAwesome.LiveView
+    end
+  end
+
+  defp widget_helpers do
+    quote do
       import FontAwesome.LiveView
     end
   end

@@ -6,7 +6,7 @@ defmodule NanopayWeb.App.FormComponent do
     <div class="relative" x-data="{isOpen: false}">
       <button
         type="button"
-        class="relative w-full pl-3 pr-10 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 focus:bg-opacity-20 sm:text-sm text-left rounded-md shadow-sm cursor-default transition-colors"
+        class="relative w-full pl-3 pr-10 py-2 text-sm text-left bg-white bg-opacity-10 hover:bg-opacity-20 focus:bg-opacity-20 rounded-md shadow-sm cursor-default transition-colors"
         @click="isOpen = !isOpen">
 
         <span class="block truncate">Any status</span>

@@ -30,7 +30,7 @@ defmodule NanopayWeb.P2P.Bip270Controller do
          {:ok, %{pay_request: pay_request}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
     do
       channel = "pr:#{ pay_request.id }"
-      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.get(pay_request, [:id, :status]))
+      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.take(pay_request, [:id, :status]))
 
       conn
       |> put_resp_header("content-type", "application/json; charset=utf-8")

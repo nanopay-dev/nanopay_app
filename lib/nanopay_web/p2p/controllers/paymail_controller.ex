@@ -45,7 +45,7 @@ defmodule NanopayWeb.P2P.PaymailController do
          {:ok, %{pay_request: pay_request, txn: txn}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
     do
       channel = "pr:#{ pay_request.id }"
-      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.get(pay_request, [:id, :status]))
+      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.take(pay_request, [:id, :status]))
 
       render(conn, "transactions.json", txn: txn)
     end

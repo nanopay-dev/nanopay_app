@@ -67,12 +67,11 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
 
   @impl true
   def handle_info(%{event: "payment", payload: payload}, %{assigns: assigns} = socket) do
-    socket = case payload.id == assigns.pay_request.id do
-      true ->
-        pay_request = Payments.get_pay_request(payload.id)
-        assign(socket, :pay_request, pay_request)
-      false ->
-        socket
+    socket = if assigns.pay_request.status != :completed and assigns.pay_request.id == payload.id do
+      pay_request = Payments.get_pay_request(payload.id)
+      assign(socket, :pay_request, pay_request)
+    else
+      socket
     end
 
     {:noreply, socket}
@@ -97,10 +96,10 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
 
       <div class="p-4">
         <.pay_summary class="mb-6" pay_request={@pay_request} />
-        <%= if @pay_request.status == :completed do %>
-          <.success_icon />
-        <% else %>
+        <%= if @pay_request.status == :pending do %>
           <.pay_method pay_request={@pay_request} pay_method={@pay_method} protocol={@pay_protocol} />
+        <% else %>
+          <.success_icon />
         <% end %>
       </div>
 
@@ -248,7 +247,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
           </div>
           <div
             class="flex flex-row-reverse"
-            data-url={"#{@pay_method.value}.#{@protocol}"}
+            data-url={pay_url(@protocol, @pay_request)}
             x-data="PayMethodBtns">
 
             <a
@@ -349,7 +348,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         id="pay-bip270"
         class="mb-4 p-2 mx-auto bg-slate-100 rounded"
         phx-hook="QrCode"
-        data-url={Routes.p2p_bip270_url(NanopayWeb.Endpoint, :show, @pay_request.id)}>
+        data-url={pay_url(@protocol, @pay_request)}>
       </div>
       <p class="text-xs text-slate-400 text-center">Scan to confirm payment</p>
     </div>
@@ -363,7 +362,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         id="pay-paymail"
         class="mb-4 p-2 mx-auto bg-slate-100 rounded"
         phx-hook="QrCode"
-        data-url={PayRequest.get_paymail(@pay_request)}>
+        data-url={pay_url(@protocol, @pay_request)}>
       </div>
       <p class="text-xs text-slate-400 text-center">Scan to confirm payment</p>
     </div>
@@ -427,6 +426,19 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
   defp show_protocol_bar?([protocol]) when protocol in ["bip270", "paymail"], do: true
   defp show_protocol_bar?(_protocols), do: false
 
+  # TODO
+  defp pay_url("bip270", pay_request) do
+    url = Routes.p2p_bip270_url(NanopayWeb.Endpoint, :show, pay_request.id)
+    "pay:?r=#{ URI.encode(url, &URI.char_unreserved?/1) }"
+  end
 
+  defp pay_url("paymail", pay_request) do
+    paymail = PayRequest.get_paymail(pay_request)
+    {:XSV, satoshis, -8, _} = pay_request
+    |> PayRequest.get_total()
+    |> Money.to_integer_exp()
+
+    "payto:#{ paymail }?amount=#{ satoshis }&purpose=#{ pay_request.description }"
+  end
 
 end

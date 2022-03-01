@@ -9,7 +9,7 @@ defmodule NanopayWeb.P2P.Bip270View do
       "memo" => pay_request.description,
       "outputs" => render_many(PayRequest.build_coins(pay_request), __MODULE__, "output.json", as: :coin),
       "creationTimestamp" => unix_timestamp(pay_request.inserted_at),
-      "expirationTimestamp" => nil,
+      #"expirationTimestamp" => nil,
       "paymentUrl" => Routes.p2p_bip270_url(NanopayWeb.Endpoint, :pay, pay_request.id)
     }
   end
@@ -28,7 +28,7 @@ defmodule NanopayWeb.P2P.Bip270View do
       "memo" => pay_request.description,
       "outputs" => render_many(PayRequest.build_coins(pay_request), __MODULE__, "output.json", as: :coin),
       "creationTimestamp" => unix_timestamp(pay_request.inserted_at),
-      "expirationTimestamp" => nil,
+      #"expirationTimestamp" => nil,
       "paymentUrl" => Routes.p2p_bip270_url(NanopayWeb.Endpoint, :pay, pay_request.id),
       "merchantData" => merchant_data(pay_request)
     }
@@ -53,7 +53,7 @@ defmodule NanopayWeb.P2P.Bip270View do
   # Returns merchant data as a string
   defp merchant_data(_) do
     Jason.encode!(%{
-      "avatarUrl" => Routes.static_url(NanopayWeb.Endpoint, "/images/icon.jpg"),
+      "avatarUrl" => Routes.static_url(NanopayWeb.Endpoint, "/images/app-icon.png"),
       "merchantName" => "Paypresto"
     })
   end
@@ -61,7 +61,5 @@ defmodule NanopayWeb.P2P.Bip270View do
   # Returns unix timestamp
   defp unix_timestamp(datetime),
     do: datetime |> DateTime.from_naive!("Etc/UTC") |> DateTime.to_unix()
-
-
 
 end

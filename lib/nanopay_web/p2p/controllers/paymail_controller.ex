@@ -42,10 +42,14 @@ defmodule NanopayWeb.P2P.PaymailController do
          {:ok, tx} <- BSV.Tx.from_binary(rawtx, encoding: :hex),
          %PayRequest{} = pay_request <- Payments.get_pay_request_by_ref(ref, status: :pending),
          %PayRequest{} = pay_request <- verify_pay_request_id(pay_request, pay_request_id),
-         {:ok, %{pay_request: pay_request, txn: txn}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
+         {:ok, %{signed_txin: txin, txn: txn}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
     do
       channel = "pr:#{ pay_request.id }"
-      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.take(pay_request, [:id, :status]))
+      NanopayWeb.Endpoint.broadcast(channel, "funded", %{
+        id: pay_request.id,
+        txin: BSV.TxIn.to_binary(txin, encoding: :hex),
+        parent: rawtx
+      })
 
       render(conn, "transactions.json", txn: txn)
     end

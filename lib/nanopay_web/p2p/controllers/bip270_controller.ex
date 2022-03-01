@@ -27,10 +27,14 @@ defmodule NanopayWeb.P2P.Bip270Controller do
   def pay(conn, %{"id" => id, "transaction" => rawtx} = params) do
     with {:ok, tx} <- BSV.Tx.from_binary(rawtx, encoding: :hex),
          %PayRequest{} = pay_request <- Payments.get_pay_request(id, status: :pending),
-         {:ok, %{pay_request: pay_request}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
+         {:ok, %{signed_txin: txin}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
     do
       channel = "pr:#{ pay_request.id }"
-      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.take(pay_request, [:id, :status]))
+      NanopayWeb.Endpoint.broadcast(channel, "funded", %{
+        id: pay_request.id,
+        txin: BSV.TxIn.to_binary(txin, encoding: :hex),
+        parent: rawtx
+      })
 
       conn
       |> put_resp_header("content-type", "application/json; charset=utf-8")

@@ -132,6 +132,9 @@ defmodule NanopayWeb.P2P.PaymailControllerTest do
       assert %{status: :funded} = Nanopay.Repo.get!(PayRequest, pay_request.id)
     end
 
+    @tag :pending
+    test "broadcasts funded event to payrequest pubsub channel"
+
     test "renders error if insufficient payment is given", %{
       conn: conn,
       pay_request: pay_request,

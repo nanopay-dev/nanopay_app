@@ -66,15 +66,17 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
   end
 
   @impl true
-  def handle_info(%{event: "payment", payload: payload}, %{assigns: assigns} = socket) do
-    socket = if assigns.pay_request.status != :completed and assigns.pay_request.id == payload.id do
+  def handle_info(%{event: "funded", payload: payload}, %{assigns: assigns} = socket) do
+    if assigns.pay_request.status != :completed and assigns.pay_request.id == payload.id do
       pay_request = Payments.get_pay_request(payload.id)
-      assign(socket, :pay_request, pay_request)
-    else
-      socket
-    end
+      socket = socket
+      |> assign(:pay_request, pay_request)
+      |> push_event("funded", payload)
 
-    {:noreply, socket}
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
@@ -88,7 +90,8 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     ~H"""
     <div
       id="pay-request"
-      phx-hook="AlpineHook">
+      phx-hook="AlpineHook"
+      x-data="PayRequest">
 
       <div class="p-4 border-b border-slate-700">
         <.pay_select options={@pay_methods} value={@pay_method} />
@@ -440,5 +443,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
 
     "payto:#{ paymail }?amount=#{ satoshis }&purpose=#{ pay_request.description }"
   end
+
+  defp pay_url(_, _), do: nil
 
 end

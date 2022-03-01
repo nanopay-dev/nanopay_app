@@ -22,6 +22,10 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     pay_method = List.first(pay_methods)
     pay_protocol = List.first(pay_method.protocols)
 
+    # Subscribe to PR subsub
+    channel = "pr:#{ pay_request.id }"
+    NanopayWeb.Endpoint.subscribe(channel)
+
     socket = assign(socket, [
       page_title: "Widget",
       pay_request: pay_request,
@@ -56,6 +60,30 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     {:noreply, assign(socket, :pay_protocol, protocol)}
   end
 
+  def handle_event("fund", _params, socket) do
+    # TODO
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(%{event: "payment", payload: payload}, %{assigns: assigns} = socket) do
+    socket = case payload.id == assigns.pay_request.id do
+      true ->
+        pay_request = Payments.get_pay_request(payload.id)
+        assign(socket, :pay_request, pay_request)
+      false ->
+        socket
+    end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def terminate(_reason, %{assigns: assigns}) do
+    channel = "pr:#{ assigns.pay_request.id }"
+    NanopayWeb.Endpoint.unsubscribe(channel)
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -69,7 +97,11 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
 
       <div class="p-4">
         <.pay_summary class="mb-6" pay_request={@pay_request} />
-        <.pay_method pay_request={@pay_request} pay_method={@pay_method} protocol={@pay_protocol} />
+        <%= if @pay_request.status == :completed do %>
+          <.success_icon />
+        <% else %>
+          <.pay_method pay_request={@pay_request} pay_method={@pay_method} protocol={@pay_protocol} />
+        <% end %>
       </div>
 
       <div class="px-4 pb-4 text-center">
@@ -181,6 +213,23 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         <span class="pl-4 text-sm font-semibold text-slate-200">
           <%= Money.mult!(@pay_request.base_rate, Decimal.add(@pay_request.amount.amount, @pay_request.fee.amount)) |> Money.to_string!(fractional_digits: 4) %>
         </span>
+      </div>
+    </div>
+    """
+  end
+
+  # TODO
+  defp success_icon(assigns) do
+    ~H"""
+    <div class="text-center">
+      <span class="text-sm font-semibold uppercase tracking-widest text-slate-500">Paid</span>
+    </div>
+    <div class="flex flex-col items-center justify-center h-48">
+      <div class="sa-success">
+        <div class="sa-success-tip"></div>
+        <div class="sa-success-long"></div>
+        <div class="sa-success-placeholder"></div>
+        <div class="sa-success-fix"></div>
       </div>
     </div>
     """

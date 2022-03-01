@@ -27,11 +27,10 @@ defmodule NanopayWeb.P2P.Bip270Controller do
   def pay(conn, %{"id" => id, "transaction" => rawtx} = params) do
     with {:ok, tx} <- BSV.Tx.from_binary(rawtx, encoding: :hex),
          %PayRequest{} = pay_request <- Payments.get_pay_request(id, status: :pending),
-         {:ok, _changes} <- Payments.fund_pay_request_with_tx(pay_request, tx)
+         {:ok, %{pay_request: pay_request}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
     do
-      # TODO figure out a way of notifying the payrequest
-      #%{invoice_status: invoice} = changes
-      #Task.async(Presto.Notifier, :invoice_status_changed, [invoice])
+      channel = "pr:#{ pay_request.id }"
+      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.get(pay_request, [:id, :status]))
 
       conn
       |> put_resp_header("content-type", "application/json; charset=utf-8")

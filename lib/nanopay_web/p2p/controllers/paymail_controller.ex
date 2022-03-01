@@ -42,11 +42,10 @@ defmodule NanopayWeb.P2P.PaymailController do
          {:ok, tx} <- BSV.Tx.from_binary(rawtx, encoding: :hex),
          %PayRequest{} = pay_request <- Payments.get_pay_request_by_ref(ref, status: :pending),
          %PayRequest{} = pay_request <- verify_pay_request_id(pay_request, pay_request_id),
-         {:ok, %{txn: txn}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
+         {:ok, %{pay_request: pay_request, txn: txn}} <- Payments.fund_pay_request_with_tx(pay_request, tx)
     do
-      # TODO figure out a way of notifying the payrequest
-      #%{insert_tx: tx, invoice_status: invoice} = changes
-      #Task.async(Presto.Notifier, :invoice_status_changed, [invoice])
+      channel = "pr:#{ pay_request.id }"
+      NanopayWeb.Endpoint.broadcast(channel, "payment", Map.get(pay_request, [:id, :status]))
 
       render(conn, "transactions.json", txn: txn)
     end

@@ -88,7 +88,8 @@ defmodule Nanopay.Payments do
   @spec fund_pay_request_with_user_wallet(PayRequest.t(), User.t()) ::
     {:ok, %{
       fiat_txn: FiatWallet.Txn.t(),
-      # todo,
+      coins: list(Coin.t()),
+      txn: Coinbox.Txn.t(),
       signed_txin: BSV.TxIn.t()
     }} |
     {:error, any()} |

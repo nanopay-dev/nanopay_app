@@ -1,5 +1,6 @@
 defmodule NanopayWeb.Widget.V1.PayRequestLive do
   use NanopayWeb, :live_view_widget
+  alias Nanopay.Accounts.User
   alias Nanopay.Payments
   alias Nanopay.Payments.PayRequest
 
@@ -17,8 +18,11 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    pay_methods = case socket.assigns.current_user do
+      %User{} -> @pay_methods
+      nil     -> Enum.reject(@pay_methods, & &1.value == "nanopay")
+    end
     pay_request = Payments.get_pay_request(id)
-    pay_methods = @pay_methods
     pay_method = List.first(pay_methods)
     pay_protocol = List.first(pay_method.protocols)
 
@@ -60,9 +64,34 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     {:noreply, assign(socket, :pay_protocol, protocol)}
   end
 
-  def handle_event("fund", _params, socket) do
-    # TODO
-    {:noreply, socket}
+  def handle_event("fund", _params, %{assigns: assigns} = socket) do
+    with %User{} = user <- assigns.current_user,
+         {:ok, %{signed_txin: txin, txn: txn}} <- Payments.fund_pay_request_with_user_wallet(assigns.pay_request, user)
+    do
+      pay_request = Payments.get_pay_request(assigns.pay_request.id)
+      socket = socket
+      |> assign(:pay_request, pay_request)
+      |> push_event("funded", %{
+        id: assigns.pay_request.id,
+        txin: BSV.TxIn.to_binary(txin, encoding: :hex),
+        parent: Base.encode16(txn.rawtx, case: :lower)
+      })
+
+      {:noreply, socket}
+    else
+      {:error, :fiat_txn, _, _} ->
+        # TODO show these errors to user
+        IO.inspect "Insufficient fiat balance"
+        {:noreply, socket}
+
+      {:error, :tx, :coinbox_low, _} ->
+        IO.inspect "Insufficient coinbox balance"
+        {:noreply, socket}
+
+      {:error, :coins, :cannot_fund_tx, _} ->
+        IO.inspect "Unsure where this error even comes from"
+        {:noreply, socket}
+    end
   end
 
   @impl true

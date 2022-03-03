@@ -170,7 +170,10 @@ defmodule NanopayWeb.App.PaymentsLive do
             </table>
           </div>
 
-          <.pagination />
+          <.pagination
+            path={Routes.app_payments_path(@socket, :index)}
+            page_number={1}
+            total_pages={10} />
         </div>
       </div>
 

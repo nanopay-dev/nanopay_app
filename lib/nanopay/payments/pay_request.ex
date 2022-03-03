@@ -2,6 +2,7 @@ defmodule Nanopay.Payments.PayRequest do
   use Ecto.Schema
   import Ecto.Changeset
   alias Nanopay.Payments.{Fees, PayCtx}
+  alias Nanopay.Coinbox.Coin
 
   # TODO - explain these
   @minimum_sats 140
@@ -12,6 +13,7 @@ defmodule Nanopay.Payments.PayRequest do
   @foreign_key_type :binary_id
   schema "pay_requests" do
     embeds_one :ctx, PayCtx
+    has_one :used_coin, Coin, where: [channel: :used]
 
     field :status, Ecto.Enum, values: [pending: 0, funded: 1, completed: 2], default: :pending
     field :keypath, :string

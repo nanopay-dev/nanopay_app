@@ -22,8 +22,8 @@ defmodule NanopayWeb.App.DashboardLive do
             <div id="balance-chart" phx-hook="BalanceChart" />
           </div>
           <div class="flex space-x-4">
-            <.topup_btn label="Topup $10" />
-            <.topup_btn label="Topup $20" />
+            <.topup_btn label="Topup $10" topup="" />
+            <.topup_btn label="Topup $20" topup="" />
           </div>
         </div>
 

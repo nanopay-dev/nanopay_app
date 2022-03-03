@@ -62,9 +62,11 @@ defmodule Nanopay.MixProject do
       {:mint, "~> 1.4"},
       {:open_api_spex, "~> 3.11"},
       {:quantum, "~> 3.4"},
+      {:scrivener_ecto, "~> 2.7"},
       {:stripity_stripe, "~> 2.12"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
-      {:tesla, "~> 1.4"}
+      {:tesla, "~> 1.4"},
+      {:timex, "~> 3.7"}
     ]
   end
 

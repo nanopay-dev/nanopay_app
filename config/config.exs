@@ -85,6 +85,10 @@ config :mime, :types, %{
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Stripe config
+config :stripity_stripe,
+  api_key: "xXxXxXxXxXx"
+
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 

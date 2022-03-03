@@ -27,6 +27,7 @@ defmodule NanopayWeb.Router do
   end
 
   pipeline :widget do
+    plug NanopayWeb.App.UserTokenPlug
     plug :delete_resp_header, "x-frame-options"
   end
 
@@ -94,6 +95,8 @@ defmodule NanopayWeb.Router do
     pipe_through [:browser, :app]
 
     post "/auth", AuthController, :create
+    get "/topup/:id/paid", TopupController, :paid
+    get "/topup/:id/cancelled", TopupController, :cancelled
 
     live_session :unauthenticated,
       session: {NanopayWeb.App.Auth, :get_auth_session, []},

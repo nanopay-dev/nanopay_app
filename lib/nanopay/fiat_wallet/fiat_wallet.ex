@@ -87,4 +87,25 @@ defmodule Nanopay.FiatWallet do
     end
   end
 
+  @doc """
+  Returns a paginated list of the given users transactions.
+  """
+  @spec paginate_user_txns(User.t(), keyword()) :: Scrivener.Page.t()
+  def paginate_user_txns(%User{id: user_id}, opts \\ []) do
+    Txn
+    |> where([t], t.user_id == ^user_id)
+    |> order_by(desc: :inserted_at)
+    |> Repo.paginate(opts)
+  end
+
+  @doc """
+  Gets a transaction for the given user by its ID.
+  """
+  @spec get_user_txn(User.t(), String.t()) :: Txn.t() | nil
+  def get_user_txn(%User{id: user_id}, id) do
+    Txn
+    |> where([t], t.user_id == ^user_id)
+    |> Repo.get(id)
+  end
+
 end

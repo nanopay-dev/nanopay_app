@@ -93,44 +93,53 @@ defmodule NanopayWeb.App.WalletLive do
         <div class="p-6 md:p-8 bg-black bg-opacity-20 rounded-lg overflow-hidden">
           <h2 class="mb-2 text-base font-bold text-gray-300">Transactions</h2>
 
-          <div class="mb-6 overflow-x-scroll">
-            <table class="min-w-full">
-              <tbody class="divide-y divide-gray-700">
-                <%= for txn <- @txns.entries do %>
-                  <tr>
-                    <td class="w-full pr-4 py-3 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <.txn_icon type={txn.subject_type} class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden" />
-                        <div class="ml-4">
-                          <p class="text-sm font-medium text-gray-100 truncate"><%= txn.description %></p>
-                          <time
-                            datetime={txn.inserted_at}
-                            class="text-sm text-gray-400">
-                            <%= Timex.format!(txn.inserted_at, "{D} {Mfull} {YYYY}, {h24}:{m}") %>
-                          </time>
+          <%= if Enum.empty?(@txns.entries) do %>
+            <.empty_state
+              title="No transactions"
+              subtitle="Get started by topping up your wallet."
+              icon="receipt">
+              <.topup_btn label="Topup $10" topup="usd_10" />
+            </.empty_state>
+          <% else %>
+            <div class="mb-6 overflow-x-scroll">
+              <table class="min-w-full">
+                <tbody class="divide-y divide-gray-700">
+                  <%= for txn <- @txns.entries do %>
+                    <tr>
+                      <td class="w-full pr-4 py-3 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <.txn_icon type={txn.subject_type} class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden" />
+                          <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-100 truncate"><%= txn.description %></p>
+                            <time
+                              datetime={txn.inserted_at}
+                              class="text-sm text-gray-400">
+                              <%= Timex.format!(txn.inserted_at, "{D} {Mfull} {YYYY}, {h24}:{m}") %>
+                            </time>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-medium">
-                      <div class={"text-lg font-medium #{ ccy_color(txn.base_amount) }"}><%= txn.base_amount %></div>
-                      <div class="text-xs text-gray-500"><%= Money.to_string!(txn.balance, fractional_digits: 4) %></div>
-                    </td>
-                    <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <%= live_patch to: Routes.app_wallet_path(@socket, :show, txn.id),
-                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                        <.icon name="search" class="fa h-4 w-4" />
-                      <% end %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                      <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-medium">
+                        <div class={"text-lg font-medium #{ ccy_color(txn.base_amount) }"}><%= txn.base_amount %></div>
+                        <div class="text-xs text-gray-500"><%= Money.to_string!(txn.balance, fractional_digits: 4) %></div>
+                      </td>
+                      <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                        <%= live_patch to: Routes.app_wallet_path(@socket, :show, txn.id),
+                          class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
+                          <.icon name="search" class="fa h-4 w-4" />
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
 
-          <.pagination
-            path={Routes.app_wallet_path(@socket, :index)}
-            page_number={@txns.page_number}
-            total_pages={@txns.total_pages} />
+            <.pagination
+              path={Routes.app_wallet_path(@socket, :index)}
+              page_number={@txns.page_number}
+              total_pages={@txns.total_pages} />
+          <% end %>
         </div>
       </div>
 

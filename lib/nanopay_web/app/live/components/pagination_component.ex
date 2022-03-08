@@ -1,6 +1,21 @@
 defmodule NanopayWeb.App.PaginationComponent do
   use NanopayWeb, :component
 
+  def empty_state(assigns) do
+    ~H"""
+    <div class="px-4 py-6 border-4 border-gray-700 border-dashed rounded-xl text-center">
+      <.icon name={@icon} class="fa h-12 w-12 text-gray-500" />
+      <h3 class="mt-2 text-sm font-bold text-gray-300"><%= @title %></h3>
+      <p class="mt-1 text-sm text-gray-400"><%= @subtitle %></p>
+      <%= if assigns[:inner_block] do %>
+        <div class="mt-6">
+          <%= render_slot(@inner_block) %>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
   def pagination(assigns) do
     ~H"""
     <nav class="flex items-center justify-center space-x-0.5 text-xs font-medium">

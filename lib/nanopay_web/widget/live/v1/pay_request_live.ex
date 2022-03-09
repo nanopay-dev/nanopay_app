@@ -1,6 +1,7 @@
 defmodule NanopayWeb.Widget.V1.PayRequestLive do
   use NanopayWeb, :live_view_widget
   alias Nanopay.Accounts.User
+  alias Nanopay.FiatWallet
   alias Nanopay.Payments
   alias Nanopay.Payments.PayRequest
 
@@ -25,6 +26,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     pay_request = Payments.get_pay_request(id)
     pay_method = List.first(pay_methods)
     pay_protocol = List.first(pay_method.protocols)
+    balance = FiatWallet.get_user_balance(assigns.current_user)
 
     # Subscribe to PR subsub
     channel = "pr:#{ pay_request.id }"
@@ -35,7 +37,8 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
       pay_request: pay_request,
       pay_methods: pay_methods,
       pay_method: pay_method,
-      pay_protocol: pay_protocol
+      pay_protocol: pay_protocol,
+      balance: balance
     ])
     {:ok, socket}
   end
@@ -136,9 +139,15 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
       </div>
 
       <div class="p-4">
-        <.pay_summary class="mb-6" pay_request={@pay_request} />
+        <.pay_summary
+          class="mb-6"
+          pay_request={@pay_request} />
         <%= if @pay_request.status == :pending do %>
-          <.pay_method pay_request={@pay_request} pay_method={@pay_method} protocol={@pay_protocol} />
+          <.pay_method
+            pay_request={@pay_request}
+            pay_method={@pay_method}
+            protocol={@pay_protocol}
+            balance={@balance} />
         <% else %>
           <.success_icon />
         <% end %>
@@ -310,7 +319,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
         </div>
       <% end %>
 
-      <.pay_method_ui pay_request={@pay_request} protocol={@protocol} />
+      <.pay_method_ui pay_request={@pay_request} protocol={@protocol} balance={@balance} />
     </div>
     """
   end
@@ -366,18 +375,31 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     """
   end
 
-  defp pay_method_ui(%{protocol: "nanopay"} = assigns) do
-    assigns = Map.put(assigns, :component_id, "btn-#{:rand.uniform(100000)}")
+  defp pay_method_ui(%{protocol: "nanopay", balance: balance} = assigns) do
+    has_balance = Money.cmp(balance, Money.new(balance.currency, 0)) == 1
+    assigns = Map.put(assigns, :has_balance, has_balance)
     ~H"""
-    <div class="flex flex-col items-center justify-center h-48">
+    <div class="flex flex-col items-center justify-center h-48 pb-6">
+      <div class="flex items-center justify-center">
+        <span class="pr-1 text-xs text-slate-400">
+          Current balance
+        </span>
+        <span class={"pl-1 text-sm font-medium #{ balance_color(@has_balance) }"}>
+          <%= @balance %>
+        </span>
+      </div>
+
       <button
-        class="inline-flex items-center justify-center w-64 mb-4 px-4 py-3 text-sm font-bold text-gray-100 bg-gradient-to-br from-green-500 to-cyan-600 hover:from-green-400 hover:to-cyan-500 rounded-md transition-colors"
+        class={"inline-flex items-center justify-center w-64 my-4 px-4 py-3 text-sm font-bold text-gray-100 rounded-md #{ button_colors(@has_balance) }"}
+        disabled={!@has_balance}
         phx-click="fund">
         <.icon name="dollar-sign" class="fa h-4 w-4 mr-1" />
         Pay
       </button>
 
-      <p class="text-xs text-slate-400 text-center">Tap to confirm payment</p>
+      <p class="text-xs text-slate-400 text-center">
+        <%= if @has_balance, do: "Tap to confirm payment", else: "Please select another payment method" %>
+      </p>
     </div>
     """
   end
@@ -483,5 +505,14 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
   end
 
   defp pay_url(_, _), do: nil
+
+  # TODO
+  defp balance_color(true), do: "text-green-300"
+  defp balance_color(_), do: "text-rose-400"
+
+  # TODO
+  defp button_colors(true), do: "bg-gradient-to-br from-green-500 to-cyan-600 hover:from-green-400 hover:to-cyan-500 transition-colors"
+  defp button_colors(_), do: "bg-gray-500"
+
 
 end

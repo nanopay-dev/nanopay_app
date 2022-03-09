@@ -335,7 +335,7 @@ defmodule Nanopay.Coinbox do
     end)
 
     # 7. set pay request to funded
-    |> Multi.update(:pay_request, Ecto.Changeset.change(pay_request, %{status: :funded}))
+    |> Multi.update(:pay_request, PayRequest.status_changeset(pay_request, :funded))
   end
 
 

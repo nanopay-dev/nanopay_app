@@ -53,6 +53,20 @@ defmodule Nanopay.Payments do
   end
 
   @doc """
+  TODO
+  """
+  @spec get_pay_request_and_set_payee(binary(), User.t() | nil) :: PayRequest.t() | nil
+  def get_pay_request_and_set_payee(id, %User{id: user_id}) do
+    PayRequest
+    |> select([p], p)
+    |> where([p], p.id == ^id)
+    |> update(set: [payee_id: ^user_id])
+    |> Repo.one()
+  end
+
+  def get_pay_request_and_set_payee(id, nil), do: get_pay_request(id)
+
+  @doc """
   Creates a Pay Requests with the given attributes.
   """
   @spec create_pay_request(map()) ::
@@ -65,6 +79,18 @@ defmodule Nanopay.Payments do
   end
 
   @doc """
+  Sets the specified payee on the given Pay Request.
+  """
+  @spec set_pay_request_payee(PayRequest.t(), User.t()) ::
+    {:ok, PayRequest.t()} |
+    {:error, Ecto.Changeset.t()}
+  def set_pay_request_payee(%PayRequest{} = pay_request, %User{id: user_id}) do
+    pay_request
+    |> Ecto.Changeset.change(%{payee_id: user_id})
+    |> Repo.update()
+  end
+
+  @doc """
   Sets the specified status on the given Pay Request.
   """
   @spec set_pay_request_status(PayRequest.t(), atom()) ::
@@ -74,6 +100,56 @@ defmodule Nanopay.Payments do
     pay_request
     |> PayRequest.status_changeset(status)
     |> Repo.update()
+  end
+
+  @doc """
+  Returns a list of the given users latest payments.
+  """
+  @spec latest_user_payments(User.t(), non_neg_integer()) :: list(PayRequest.t())
+  def latest_user_payments(%User{id: user_id}, lmt \\ 5) do
+    PayRequest
+    |> where([p], p.payee_id == ^user_id and p.status == :completed)
+    |> order_by(desc: :inserted_at)
+    |> limit(^lmt)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns a paginated list of the given users payments.
+  """
+  @spec paginate_user_payments(User.t(), keyword()) :: Scrivener.Page.t()
+  def paginate_user_payments(%User{id: user_id}, opts \\ []) do
+    PayRequest
+    |> where([p], p.payee_id == ^user_id and p.status == :completed)
+    |> order_by(desc: :inserted_at)
+    |> Repo.paginate(opts)
+  end
+
+  @doc """
+  TODO
+  """
+  def user_payment_stats(%User{id: user_id}) do
+    # Subquery fetch payments
+    start = Date.add(Date.utc_today(), -30)
+    data = from p in PayRequest,
+      where: p.payee_id == ^user_id and p.status == :completed,
+      where: type(p.completed_at, :date) >= ^start
+
+    # Query joined to date series
+    query = from p in subquery(data),
+      right_join: d in fragment("SELECT generate_series(now() - '30 days'::interval, now(), '1 day'::interval)::date as day"),
+      on: d.day == fragment("date(?)", p.completed_at),
+      group_by: d.day,
+      order_by: d.day,
+      select: %{
+        date: d.day,
+        payments: count(p),
+        amount: fragment("COALESCE(sum(amount(?) * amount(?)), 0)", p.amount, p.base_rate),
+        fees: fragment("COALESCE(sum(amount(?) * amount(?)), 0)", p.fee, p.base_rate)
+      }
+
+    Repo.all(query)
+
   end
 
   @doc """
@@ -156,7 +232,7 @@ defmodule Nanopay.Payments do
       end)
     end)
     # 4. set pay request to funded
-    |> Multi.update(:pay_request, Ecto.Changeset.change(pay_request, %{status: :funded}))
+    |> Multi.update(:pay_request, PayRequest.status_changeset(pay_request, :funded))
     # 5. broadcast txn
     # TODO
     # 6. sign utxo
@@ -213,7 +289,7 @@ defmodule Nanopay.Payments do
       from t in Coinbox.Txn, where: t.txid in ^txids
     end, set: [status: :pushed])
     # 4. update pay request as completed
-    |> Multi.update(:pay_request, Ecto.Changeset.change(pay_request, %{status: :completed}))
+    |> Multi.update(:pay_request, PayRequest.status_changeset(pay_request, :completed))
     |> Repo.transaction()
   end
 

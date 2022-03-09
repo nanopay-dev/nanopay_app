@@ -11,32 +11,32 @@ defmodule NanopayWeb.App.SidebarComponent do
           path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
           current: view == NanopayWeb.App.DashboardLive
         }, %{
-          name: "Wallet",
-          icon: "wallet",
-          path: Routes.app_wallet_path(NanopayWeb.Endpoint, :index),
-          current: view == NanopayWeb.App.WalletLive
-        }, %{
           name: "Payments",
           icon: "receipt",
           path: Routes.app_payments_path(NanopayWeb.Endpoint, :index),
           current: view == NanopayWeb.App.PaymentsLive
         }, %{
-          name: "Connected apps",
-          icon: "code",
-          path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
-          current: false
+          name: "Wallet",
+          icon: "wallet",
+          path: Routes.app_wallet_path(NanopayWeb.Endpoint, :index),
+          current: view == NanopayWeb.App.WalletLive
+        #}, %{
+        #  name: "Connected apps",
+        #  icon: "code",
+        #  path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
+        #  current: false
         }
       ]
-    } ,%{
-      name: "Developer menu",
-      links: [
-        %{
-          name: "Your apps",
-          icon: "code",
-          path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
-          current: false
-        }
-      ]
+    #} ,%{
+    #  name: "Developer menu",
+    #  links: [
+    #    %{
+    #      name: "Your apps",
+    #      icon: "code",
+    #      path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
+    #      current: false
+    #    }
+    #  ]
     }]
   end
 

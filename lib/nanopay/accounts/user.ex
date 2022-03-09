@@ -8,6 +8,7 @@ defmodule Nanopay.Accounts.User do
   alias Nanopay.Accounts.{Profile, KeyData}
   alias Nanopay.FiatWallet
   alias Nanopay.FiatWallet.Topup
+  alias Nanopay.Payments.PayRequest
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -16,6 +17,7 @@ defmodule Nanopay.Accounts.User do
     embeds_one :key_data, KeyData
     has_many :fiat_txns, FiatWallet.Txn
     has_many :topups, Topup
+    has_many :pay_requests, PayRequest, foreign_key: :payee_id
 
     field :email, :string
     field :password, :string, virtual: true

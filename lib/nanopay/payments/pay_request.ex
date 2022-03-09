@@ -2,6 +2,7 @@ defmodule Nanopay.Payments.PayRequest do
   use Ecto.Schema
   import Ecto.Changeset
   alias Nanopay.Payments.{Fees, PayCtx}
+  alias Nanopay.Accounts.User
   alias Nanopay.Coinbox.Coin
 
   # TODO - explain these
@@ -12,6 +13,7 @@ defmodule Nanopay.Payments.PayRequest do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "pay_requests" do
+    belongs_to :payee, User
     embeds_one :ctx, PayCtx
     has_one :used_coin, Coin, where: [channel: :used]
 
@@ -84,6 +86,28 @@ defmodule Nanopay.Payments.PayRequest do
   end
 
   @doc """
+  TODO
+  """
+  @spec to_base_ccy(Schema.t(), :amount | :fee | :total) :: Money.t()
+  def to_base_ccy(pay_request, attr \\ :amount)
+
+  def to_base_ccy(%__MODULE__{base_rate: base_rate} = pay_request, attr) when attr in [:amount, :fee] do
+    pay_request
+    |> Map.get(attr)
+    |> Money.to_decimal()
+    |> Decimal.mult(base_rate.amount)
+    |> Money.new!(base_rate.currency)
+  end
+
+  def to_base_ccy(%__MODULE__{base_rate: base_rate} = pay_request, :total) do
+    pay_request
+    |> get_total()
+    |> Money.to_decimal()
+    |> Decimal.mult(base_rate.amount)
+    |> Money.new!(base_rate.currency)
+  end
+
+  @doc """
   Builds the expected coins required to satisfy the Pay Request.
   """
   @spec build_coins(Schema.t()) :: list(Nanopay.Coinbox.Coin.t())
@@ -138,7 +162,7 @@ defmodule Nanopay.Payments.PayRequest do
   # TODO
   defp put_completed_at(changes) do
     case get_field(changes, :status) do
-      :completed ->
+      :funded ->
         now = DateTime.utc_now() |> DateTime.truncate(:second)
         put_change(changes, :completed_at, now)
       _ ->

@@ -12,12 +12,14 @@ defmodule Nanopay.Repo.Migrations.CreatePayRequests do
       add :base_rate, :money_with_currency
       add :ctx, :map
       add :completed_at, :utc_datetime
+      add :payee_id, references(:users, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end
 
     create index(:pay_requests, [:status])
     create index(:pay_requests, ["(encode(substring(sha256(id::text::bytea) FROM 1 FOR 4), 'hex'))"], name: :pay_requests_ref_index)
+    create index(:pay_requests, [:payee_id])
     create index(:pay_requests, [:inserted_at])
   end
 end

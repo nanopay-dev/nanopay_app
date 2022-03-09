@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :nanopay, Nanopay.Repo,
   hostname: "localhost",
-  database: "nanopay2_dev",
+  database: "nanopay_dev",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 

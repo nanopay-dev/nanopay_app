@@ -17,8 +17,8 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
   ]
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    pay_methods = case socket.assigns.current_user do
+  def mount(%{"id" => id}, _session, %{assigns: assigns} = socket) do
+    pay_methods = case assigns.current_user do
       %User{} -> @pay_methods
       nil     -> Enum.reject(@pay_methods, & &1.value == "nanopay")
     end
@@ -68,14 +68,11 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     with %User{} = user <- assigns.current_user,
          {:ok, %{signed_txin: txin, txn: txn}} <- Payments.fund_pay_request_with_user_wallet(assigns.pay_request, user)
     do
-      pay_request = Payments.get_pay_request(assigns.pay_request.id)
-      socket = socket
-      |> assign(:pay_request, pay_request)
-      |> push_event("funded", %{
+      send(self(), %{event: "funded", payload: %{
         id: assigns.pay_request.id,
         txin: BSV.TxIn.to_binary(txin, encoding: :hex),
         parent: Base.encode16(txn.rawtx, case: :lower)
-      })
+      }})
 
       {:noreply, socket}
     else
@@ -97,7 +94,10 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
   @impl true
   def handle_info(%{event: "funded", payload: payload}, %{assigns: assigns} = socket) do
     if assigns.pay_request.status != :completed and assigns.pay_request.id == payload.id do
-      pay_request = Payments.get_pay_request(payload.id)
+      pay_request = payload.id
+      |> Payments.get_pay_request()
+      |> set_payee(assigns.current_user)
+
       socket = socket
       |> assign(:pay_request, pay_request)
       |> push_event("funded", payload)
@@ -107,6 +107,15 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
       {:noreply, socket}
     end
   end
+
+  # Sets payee on pay request
+  defp set_payee(%PayRequest{} = pay_request, %User{} = user) do
+    with {:ok, pay_request} <- Payments.set_pay_request_payee(pay_request, user) do
+      pay_request
+    end
+  end
+
+  defp set_payee(%PayRequest{} = pay_request, nil), do: pay_request
 
   @impl true
   def terminate(_reason, %{assigns: assigns}) do

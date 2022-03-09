@@ -176,7 +176,7 @@ defmodule NanopayWeb.App.WalletLive do
     ~H"""
     <.live_component
       module={NanopayWeb.App.ModalComponent}
-      id="txn.id-todo"
+      id={"txn-#{ @txn.id }"}
       close-to={Routes.app_wallet_path(NanopayWeb.Endpoint, :index)}>
 
       <div class="flex items-center">

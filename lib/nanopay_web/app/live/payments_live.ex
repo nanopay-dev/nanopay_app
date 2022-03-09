@@ -1,8 +1,17 @@
 defmodule NanopayWeb.App.PaymentsLive do
   use NanopayWeb, :live_view
+  alias Nanopay.Payments
+  alias Nanopay.Payments.PayRequest
+  alias Nanopay.Coinbox
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, _session, %{assigns: assigns} = socket) do
+    payments = Payments.paginate_user_payments(assigns.current_user)
+
+    socket = assign(socket, [
+      payments: payments
+    ])
+
     {:ok, socket}
   end
 
@@ -11,15 +20,25 @@ defmodule NanopayWeb.App.PaymentsLive do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :index, _params) do
+  defp apply_action(%{assigns: assigns} = socket, :index, params) do
+    payments = case Map.get(params, "page") do
+      nil -> assigns.payments
+      page -> Payments.paginate_user_payments(assigns.current_user, page: page)
+    end
+
     assign(socket, [
-      page_title: "Payments"
+      page_title: "Payments",
+      payments: payments
     ])
   end
 
-  defp apply_action(socket, :show, _params) do
+  defp apply_action(socket, :show, %{"id" => id}) do
+    pay_request = Payments.get_pay_request(id)
+    |> Nanopay.Repo.preload(:used_coin)
+
     assign(socket, [
-      page_title: "Txn"
+      page_title: pay_request.description,
+      payment: pay_request
     ])
   end
 
@@ -31,149 +50,55 @@ defmodule NanopayWeb.App.PaymentsLive do
         <div class="p-6 md:p-8 bg-black bg-opacity-20 rounded-lg overflow-hidden">
           <h2 class="mb-2 text-base font-bold text-gray-300">Transactions</h2>
 
-          <div class="mb-6 overflow-x-scroll">
-            <table class="min-w-full">
-              <tbody class="divide-y divide-gray-700">
-                <%= for _i <- 1..2 do %>
-                  <tr>
-                    <td class="w-full pr-4 py-3 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
-                          <.icon name="code" class="fa w-5 h-5 text-white" />
-                        </div>
-                        <div class="ml-4">
-                          <p class="text-sm font-medium text-gray-100 truncate">Twetch post</p>
-                          <p class="text-sm text-gray-400">7 February 2022</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="px-3 inline-flex text-xs leading-6 font-semibold rounded-full bg-green-200 bg-opacity-20 text-green-200">Completed</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="text-sm font-medium text-gray-400">₿ 0.00327292</div>
-                      <div class="text-sm text-gray-500">$ 0.02</div>
-                    </td>
-                    <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <%= live_patch to: Routes.app_payments_path(@socket, :show, "foobar"),
-                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                        <.icon name="search" class="fa h-4 w-4" />
-                      <% end %>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-full pr-4 py-3 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
-                          <.icon name="code" class="fa w-5 h-5 text-white" />
-                        </div>
-                        <div class="ml-4">
-                          <p class="text-sm font-medium text-gray-100 truncate">Twetch post</p>
-                          <p class="text-sm text-gray-400">7 February 2022</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="px-3 inline-flex text-xs leading-6 font-semibold rounded-full bg-green-200 bg-opacity-20 text-green-200">Completed</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="text-sm font-medium text-gray-400">₿ 0.00327292</div>
-                      <div class="text-sm text-gray-500">$ 0.02</div>
-                    </td>
-                    <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <%= live_patch to: Routes.app_payments_path(@socket, :show, "foobar"),
-                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                        <.icon name="search" class="fa h-4 w-4" />
-                      <% end %>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-full pr-4 py-3 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
-                          <.icon name="code" class="fa w-5 h-5 text-white" />
-                        </div>
-                        <div class="ml-4">
-                          <p class="text-sm font-medium text-gray-100 truncate">Bitpost comment</p>
-                          <p class="text-sm text-gray-400">6 February 2022</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="px-3 inline-flex text-xs leading-6 font-semibold rounded-full bg-green-200 bg-opacity-20 text-green-200">Completed</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="text-sm font-medium text-gray-400">₿ 0.00327292</div>
-                      <div class="text-sm text-gray-500">$ 0.02</div>
-                    </td>
-                    <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <%= live_patch to: Routes.app_payments_path(@socket, :show, "foobar"),
-                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                        <.icon name="search" class="fa h-4 w-4" />
-                      <% end %>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-full pr-4 py-3 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
-                          <.icon name="code" class="fa w-5 h-5 text-white" />
-                        </div>
-                        <div class="ml-4">
-                          <p class="text-sm font-medium text-gray-100 truncate">Some 21e8 mystical shit</p>
-                          <p class="text-sm text-gray-400">5 February 2022</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="px-3 inline-flex text-xs leading-6 font-semibold rounded-full bg-green-200 bg-opacity-20 text-green-200">Completed</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="text-sm font-medium text-gray-400">₿ 0.00327292</div>
-                      <div class="text-sm text-gray-500">$ 0.02</div>
-                    </td>
-                    <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <%= live_patch to: Routes.app_payments_path(@socket, :show, "foobar"),
-                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                        <.icon name="search" class="fa h-4 w-4" />
-                      <% end %>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-full pr-4 py-3 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
-                          <.icon name="code" class="fa w-5 h-5 text-white" />
-                        </div>
-                        <div class="ml-4">
-                          <p class="text-sm font-medium text-gray-100 truncate">Some 21e8 mystical shit</p>
-                          <p class="text-sm text-gray-400">5 February 2022</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="px-3 inline-flex text-xs leading-6 font-semibold rounded-full bg-amber-200 bg-opacity-20 text-amber-200">Pending</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="text-sm font-medium text-gray-400">₿ 0.00327292</div>
-                      <div class="text-sm text-gray-500">$ 0.02</div>
-                    </td>
-                    <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <%= live_patch to: Routes.app_payments_path(@socket, :show, "foobar"),
-                        class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                        <.icon name="search" class="fa h-4 w-4" />
-                      <% end %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
+          <%= if Enum.empty?(@payments.entries) do %>
+            <.empty_state
+              title="No payments"
+              subtitle="Get started by topping up your wallet."
+              icon="receipt" />
+          <% else %>
 
-          <.pagination
-            path={Routes.app_payments_path(@socket, :index)}
-            page_number={1}
-            total_pages={10} />
+            <div class="mb-6 overflow-x-scroll">
+              <table class="min-w-full">
+                <tbody class="divide-y divide-gray-700">
+                  <%= for payment <- @payments.entries do %>
+                    <tr>
+                      <td class="w-full pr-4 py-3 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <.txn_icon pay_request={payment} class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden" />
+                          <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-100 truncate"><%= payment.description %></p>
+                            <time
+                              datetime={payment.inserted_at}
+                              class="text-sm text-gray-400">
+                              <%= Timex.format!(payment.inserted_at, "{D} {Mfull} {YYYY}, {h24}:{m}") %>
+                            </time>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <.status_badge status={payment.status} />
+                      </td>
+                      <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="text-sm font-medium text-gray-400"><%= payment.amount %></div>
+                        <div class="text-sm text-gray-500"><%= PayRequest.to_base_ccy(payment, :amount) |> Money.to_string!(fractional_digits: 4) %></div>
+                      </td>
+                      <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                        <%= live_patch to: Routes.app_payments_path(@socket, :show, payment.id),
+                          class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
+                          <.icon name="search" class="fa h-4 w-4" />
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <.pagination
+              path={Routes.app_payments_path(@socket, :index)}
+              page_number={@payments.page_number}
+              total_pages={@payments.total_pages} />
+          <% end %>
         </div>
       </div>
 
@@ -192,12 +117,116 @@ defmodule NanopayWeb.App.PaymentsLive do
       </div>
 
       <%= if @live_action == :show do %>
-        <.payment_modal />
+        <.payment_modal payment={@payment} />
       <% end %>
     </div>
     """
   end
 
+  # TODO
+  defp payment_modal(assigns) do
+    ~H"""
+    <.live_component
+      module={NanopayWeb.App.ModalComponent}
+      id={"pmt-#{ @payment.id }"}
+      close-to={Routes.app_payments_path(NanopayWeb.Endpoint, :index)}>
+
+      <div class="flex items-center">
+        <.txn_icon pay_request={@payment} class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden" />
+        <div class="flex-auto px-4">
+          <p class="text-base font-medium text-gray-100 truncate"><%= @payment.description %></p>
+          <time
+            datetime={@payment.inserted_at}
+            class="text-sm text-gray-400">
+            <%= Timex.format!(@payment.inserted_at, "{D} {Mfull} {YYYY}, {h24}:{m}") %>
+          </time>
+        </div>
+        <div class="flex-shrink-0">
+          <span class="text-lg font-medium text-rose-400"><%= PayRequest.to_base_ccy(@payment, :amount) |> Money.to_string!(fractional_digits: 4) %></span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 md:ml-14 border-t border-gray-700">
+        <div class="overflow-x-scroll">
+          <.payment_table payment={@payment} />
+        </div>
+      </div>
+
+    </.live_component>
+    """
+  end
+
+  # TODO
+  defp payment_table(assigns) do
+    assigns = case assigns.payment.used_coin do
+      %Coinbox.Coin{} = coin ->
+        address = coin
+        |> Coinbox.Key.derive_pubkey()
+        |> BSV.Address.from_pubkey()
+        |> BSV.Address.to_string()
+
+        assign(assigns, :address, address)
+
+      nil ->
+        assigns
+    end
+
+    ~H"""
+    <table class="min-w-full">
+      <tbody class="divide-y divide-gray-800">
+        <%= unless is_nil(@payment.used_coin) do %>
+          <tr>
+            <td class="py-2 pr-4 text-xs text-gray-500">TXID</td>
+            <td class="py-2 pl-4 text-xs text-gray-400 text-right">
+              <a
+                href={"https://whatsonchain.com/tx/#{ @payment.used_coin.spending_txid }"}
+                target="_blank"
+                class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
+                <%= trunc_txid(@payment.used_coin.spending_txid) %>
+                <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="py-2 pr-4 text-xs text-gray-500">Address</td>
+            <td class="py-2 pl-4 text-xs text-gray-400 text-right">
+              <a
+                href={"https://whatsonchain.com/address/#{ @address }"}
+                target="_blank"
+                class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
+                <%= @address %>
+                <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
+              </a>
+            </td>
+          </tr>
+        <% end %>
+        <tr>
+          <td class="py-2 pr-4 text-xs text-gray-500">Amount (BSV)</td>
+          <td class="py-2 pl-4 text-xs text-gray-400 text-right"><%= @payment.amount %></td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4 text-xs text-gray-500">Service fee (BSV)</td>
+          <td class="py-2 pl-4 text-xs text-gray-400 text-right"><%= @payment.fee %></td>
+        </tr>
+      </tbody>
+    </table>
+    """
+  end
+
+  # TODO
+  defp status_badge(assigns) do
+    ~H"""
+    <span
+      class={"px-3 inline-flex text-xs leading-6 font-semibold rounded-full bg-opacity-20 #{status_badge_colors(@status)}"}>
+      <%= Phoenix.Naming.humanize(@status) %>
+    </span>
+    """
+  end
+
+  # TODO
+  defp status_badge_colors(:pending), do: "text-amber-200 bg-amber-200"
+  defp status_badge_colors(_), do: "text-green-200 bg-green-200"
+
+  # TODO
   defp status_option(assigns) do
     colors = case assigns.status do
       "pending" -> "bg-amber-200 bg-opacity-20 text-amber-200"
@@ -214,62 +243,20 @@ defmodule NanopayWeb.App.PaymentsLive do
     """
   end
 
-  defp payment_modal(assigns) do
+  # TODO
+  defp txn_icon(assigns) do
     ~H"""
-    <.live_component
-      module={NanopayWeb.App.ModalComponent}
-      id="payment.id-todo"
-      close-to={Routes.app_payments_path(NanopayWeb.Endpoint, :index)}>
-
-      <div class="flex items-center">
-        <div class="flex flex-shrink-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-rose-500">
-          <.icon name="code" class="fa w-5 h-5 text-white" />
-        </div>
-        <div class="flex-auto px-4">
-          <p class="text-base font-medium text-gray-100 truncate">Twetch post</p>
-          <p class="text-sm text-gray-400">7 February 2022</p>
-        </div>
-        <div class="flex-shrink-0">
-          <span class="text-lg font-medium text-rose-400">-$0.02</span>
-        </div>
-      </div>
-      <div class="mt-4 pt-4 md:ml-14 border-t border-gray-700">
-        <div class="overflow-x-scroll">
-          <table class="min-w-full">
-            <tbody class="divide-y divide-gray-800">
-              <tr>
-                <td class="py-2 pr-4 text-xs text-gray-500">TXID</td>
-                <td class="py-2 pl-4 text-xs text-gray-400 text-right">
-                  <a href="#" class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
-                    770531b7&hellip;4a8a9c1f
-                    <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td class="py-2 pr-4 text-xs text-gray-500">Address</td>
-                <td class="py-2 pl-4 text-xs text-gray-400 text-right">
-                  <a href="#" class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
-                    18VWHjMt4ixHddPPbs6righWTs3Sg2QNcn
-                    <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td class="py-2 pr-4 text-xs text-gray-500">Amount (BSV)</td>
-                <td class="py-2 pl-4 text-xs text-gray-400 text-right">₿ 0.00327292</td>
-              </tr>
-              <tr>
-                <td class="py-2 pr-4 text-xs text-gray-500">Service fee (BSV)</td>
-                <td class="py-2 pl-4 text-xs text-gray-400 text-right">₿ 0.00068240</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </.live_component>
+    <div class={"#{@class} bg-gradient-to-r from-pink-500 to-rose-500"}>
+      <.icon name="code" class="fa w-5 h-5 text-white" />
+    </div>
     """
+  end
+
+  # TODO
+  defp trunc_txid(txid) do
+    {a, _} = String.split_at(txid, 8)
+    {_, b} = String.split_at(txid, -8)
+    a <> "…" <> b
   end
 
 end

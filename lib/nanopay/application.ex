@@ -5,6 +5,22 @@ defmodule Nanopay.Application do
 
   use Application
 
+  @mix_env Mix.env()
+
+  @doc """
+  Returns the application environment set as the PHX_ENV runtime environment
+  variable, falling back to the result of `Mix.env()` at compile time.
+  """
+  @spec env() :: String.t()
+  def env(), do: System.get_env("PHX_ENV", Atom.to_string(@mix_env))
+
+  @doc """
+  Returns a boolean if the given value matches the current application environment.
+  """
+  @spec env?(String.t() | atom()) :: boolean()
+  def env?(e) when is_atom(e), do: env?(Atom.to_string(e))
+  def env?(e) when is_binary(e), do: env() == e
+
   @impl true
   def start(_type, _args) do
     children = [
@@ -26,7 +42,7 @@ defmodule Nanopay.Application do
     ]
 
     # Append exchange rate and MAPI processes unless in TEST
-    children = unless Mix.env() == :test do
+    children = unless env?(:test) do
       mapi_opts = Application.fetch_env!(:nanopay, :mapi)
       children ++ [
         Nanopay.Currency.CryptoRates,
@@ -50,4 +66,6 @@ defmodule Nanopay.Application do
     NanopayWeb.Endpoint.config_change(changed, removed)
     :ok
   end
+
+
 end

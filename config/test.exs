@@ -26,3 +26,6 @@ config :logger, level: :warn
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Import local secrets
+import_config "local.secret.exs"

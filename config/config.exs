@@ -9,7 +9,8 @@ import Config
 
 config :nanopay,
   ecto_repos: [Nanopay.Repo],
-  generators: [binary_id: true]
+  generators: [binary_id: true],
+  paymail_host: "nanopay.cash"
 
 # Configures the endpoint
 config :nanopay, NanopayWeb.Endpoint,
@@ -17,13 +18,6 @@ config :nanopay, NanopayWeb.Endpoint,
   render_errors: [view: NanopayWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Nanopay.PubSub,
   live_view: [signing_salt: "aks66R6V"]
-
-# Crypto config options - TODO annotate these
-config :nanopay,
-  coinbox_seed: "WcV7z1Xmg0MbVZU9eckHy1Fmeekx+zvJblbXL1OE3RwTNFhFNpZ9hY0Dkh5I0t/kMy9qAvZJCf4oUamUCEEVEw==",
-  master_key: "xXxXxXxXxXx",
-  encryption_key: "4iZVg76SSDAxlK00N24NUkH31agvm1TadcMDiySSZH4=",
-  paymail_host: "nanopay.cash"
 
 # Configures the mailer
 #

@@ -175,8 +175,8 @@ defmodule NanopayWeb.App.SidebarComponent do
   defp avatar(assigns) do
     # <img class="inline-block h-9 w-9 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
     ~H"""
-    <span class="flex flex-col items-center justify-center h-9 w-9 rounded-full bg-slate-200 border border-slate-900">
-      <span class="text-xl text-blue-600 font-light"><%= String.at(@profile.handle, 0) |> String.upcase() %></span>
+    <span class="flex flex-col items-center justify-center h-9 w-9 rounded-full bg-slate-200 border border-indigo-800">
+      <span class="text-xl text-indigo-600 font-light"><%= String.at(@profile.handle, 0) |> String.upcase() %></span>
     </span>
     """
   end

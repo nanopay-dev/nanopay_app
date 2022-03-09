@@ -1,0 +1,1 @@
+call "%~dp0\nanopay" eval Nanopay.Release.migrate

@@ -24,6 +24,9 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 nanopay-*.tar
 
+# Ingore local secret config files
+/config/*.secret.exs
+
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
 

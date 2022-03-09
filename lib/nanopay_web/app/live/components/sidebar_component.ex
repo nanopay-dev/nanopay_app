@@ -76,7 +76,9 @@ defmodule NanopayWeb.App.SidebarComponent do
           </div>
 
           <div>
-            <.user_menu />
+            <.user_menu
+              current_user={@current_user}
+              current_profile={@current_profile} />
           </div>
         </div>
 
@@ -101,10 +103,10 @@ defmodule NanopayWeb.App.SidebarComponent do
         @click="isOpen = !isOpen">
         <div class="flex items-center">
           <div>
-            <img class="inline-block h-9 w-9 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+            <.avatar profile={@current_profile} />
           </div>
           <div class="mx-3 flex-auto">
-            <p class="text-sm font-medium text-white">Tom Cook</p>
+            <p class="text-sm font-medium text-white"><%= @current_profile.handle %></p>
             <p class="text-xs font-medium text-gray-300 group-hover:text-gray-200">View profile</p>
           </div>
           <div>
@@ -127,15 +129,18 @@ defmodule NanopayWeb.App.SidebarComponent do
         <div class="bg-black bg-opacity-40 divide-y divide-gray-800">
           <div class="px-4 py-3">
             <p class="text-sm">Signed in as</p>
-            <p class="text-sm font-medium truncate">tom@example.com</p>
+            <p class="text-sm font-medium truncate"><%= @current_user.email %></p>
           </div>
           <div class="py-1">
-            <a class="flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5 cursor-pointer">
+            <%= live_redirect to: Routes.app_account_path(NanopayWeb.Endpoint, :index),
+              class: "flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5"
+            do %>
               <span class="inline-block w-4 mr-3 ">
                 <.icon name="cog" class="fa w-4 h-4" />
               </span>
               Account settings
-            </a>
+            <% end %>
+            <!--
             <a class="flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5 cursor-pointer">
               <span class="inline-block w-4 mr-3 ">
                 <.icon name="question" class="fa w-4 h-4" />
@@ -148,6 +153,7 @@ defmodule NanopayWeb.App.SidebarComponent do
               </span>
               Privacy
             </a>
+            -->
           </div>
           <div class="py-1">
             <%= link to: Routes.app_auth_path(NanopayWeb.Endpoint, :delete),
@@ -163,6 +169,15 @@ defmodule NanopayWeb.App.SidebarComponent do
         </div>
       </div>
     </div>
+    """
+  end
+
+  defp avatar(assigns) do
+    # <img class="inline-block h-9 w-9 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+    ~H"""
+    <span class="flex flex-col items-center justify-center h-9 w-9 rounded-full bg-slate-200 border border-slate-900">
+      <span class="text-xl text-blue-600 font-light"><%= String.at(@profile.handle, 0) |> String.upcase() %></span>
+    </span>
     """
   end
 

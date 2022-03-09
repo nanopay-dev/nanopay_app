@@ -85,8 +85,6 @@ defmodule Nanopay.PaymentsTest do
       assert %{fiat_txn: %FiatWallet.Txn{} = txn} = changes
       assert Money.sub!(txn.balance, txn.base_amount) |> Money.cmp!(ctx.txn.balance) == 0
 
-      #IO.inspect changes
-
       #assert %{change: %Coin{satoshis: chg_sats}} = changes
       #assert %{tx: %BSV.Tx{outputs: [chg]} = tx} = changes
       #assert length(tx.inputs) == 1

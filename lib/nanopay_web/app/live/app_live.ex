@@ -1,6 +1,7 @@
 defmodule NanopayWeb.App.AppLive do
   import Phoenix.LiveView
   alias NanopayWeb.Router.Helpers, as: Routes
+  alias Nanopay.Accounts
   alias Nanopay.Accounts.User
   alias BSV.{PrivKey, PubKey}
 
@@ -10,9 +11,17 @@ defmodule NanopayWeb.App.AppLive do
     |> PubKey.from_privkey()
     |> PubKey.to_binary(encoding: :hex)
 
+    profile = case Map.get(session, "current_user") do
+      %User{} = user ->
+        Accounts.get_user_profile(user)
+      _ ->
+        nil
+    end
+
     socket = assign(socket, [
       master_pubkey: master_pubkey,
       current_user: Map.get(session, "current_user"),
+      current_profile: profile,
       session_key: Map.get(session, "session_key")
     ])
 

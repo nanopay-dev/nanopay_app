@@ -1,4 +1,7 @@
-<.sidebar sections={sidebar_sections(@socket.view)} />
+<.sidebar
+  sections={sidebar_sections(@socket.view)}
+  current_user={@current_user}
+  current_profile={@current_profile} />
 
 <div class="pt-12 md:pt-0 md:pl-64 xtransition-all">
   <div class="py-6">

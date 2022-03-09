@@ -9,7 +9,7 @@ defmodule NanopayWeb.App.UserTokenPlug do
   """
   import Plug.Conn
   alias Nanopay.Accounts
-  alias Nanopay.Accounts.User
+  alias Nanopay.Accounts.{User, Profile}
   alias NanopayWeb.App.Auth
 
   @doc false

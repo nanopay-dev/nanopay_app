@@ -38,6 +38,18 @@ defmodule Nanopay.Accounts do
   end
 
   @doc """
+  TODO
+  """
+  @spec get_user_profile(User.t()) :: Profile.t() | nil
+  def get_user_profile(%User{id: user_id}) do
+    Profile
+    |> where([p], p.user_id == ^user_id)
+    |> order_by(:inserted_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @doc """
   Creates a new user and user profile with the given params.
   """
   @spec register_user(map(), map()) ::

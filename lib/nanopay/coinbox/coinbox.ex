@@ -317,7 +317,6 @@ defmodule Nanopay.Coinbox do
             {url, opts} -> Manic.miner(url, opts)
             url -> Manic.miner(url)
           end
-          IO.inspect Base.encode16(txn.rawtx)
           case Manic.TX.push(miner, Base.encode16(txn.rawtx)) do
             {:ok, payload} ->
               update_txn_with_mapi_payload(txn, payload)

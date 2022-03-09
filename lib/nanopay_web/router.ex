@@ -83,6 +83,7 @@ defmodule NanopayWeb.Router do
       root_layout: {NanopayWeb.App.LayoutView, :root}
     do
       live "/", DashboardLive, :show
+      live "/account", AccountLive, :index
       live "/wallet", WalletLive, :index
       live "/wallet/txn/:id", WalletLive, :show
       live "/payments", PaymentsLive, :index

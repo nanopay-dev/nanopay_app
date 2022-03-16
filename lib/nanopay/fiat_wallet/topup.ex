@@ -54,15 +54,15 @@ defmodule Nanopay.FiatWallet.Topup do
 
   # Returns Stripe product for the topup type
   defp get_product_data(:amount, "usd_10") do
-    %{name: "Ten buck topup", description: "We can add a lil description here..."}
+    %{name: "Ten dollar topup", description: "Add $10 USD to your wallet"}
   end
 
   defp get_product_data(:amount, "usd_20") do
-    %{name: "Twenty buck topup"}
+    %{name: "Twenty dollar topup", description: "Add $20 USD to your wallet"}
   end
 
   defp get_product_data(:amount, "usd_30") do
-    %{name: "Thirty buck topup"}
+    %{name: "Thirty dollar topup", description: "Add $30 USD to your wallet"}
   end
 
   defp get_product_data(:fee, _), do: %{name: "Topup fee"}

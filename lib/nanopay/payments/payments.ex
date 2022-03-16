@@ -133,12 +133,12 @@ defmodule Nanopay.Payments do
     start = Date.add(Date.utc_today(), -30)
     data = from p in PayRequest,
       where: p.payee_id == ^user_id and p.status == :completed,
-      where: type(p.completed_at, :date) >= ^start
+      where: type(p.funded_at, :date) >= ^start
 
     # Query joined to date series
     query = from p in subquery(data),
       right_join: d in fragment("SELECT generate_series(now() - '30 days'::interval, now(), '1 day'::interval)::date as day"),
-      on: d.day == fragment("date(?)", p.completed_at),
+      on: d.day == fragment("date(?)", p.funded_at),
       group_by: d.day,
       order_by: d.day,
       select: %{
@@ -149,7 +149,6 @@ defmodule Nanopay.Payments do
       }
 
     Repo.all(query)
-
   end
 
   @doc """

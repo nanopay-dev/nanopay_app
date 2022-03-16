@@ -7,7 +7,7 @@ defmodule NanopayWeb.App.DashboardLive do
   def mount(_params, _session, %{assigns: assigns} = socket) do
     latest_payments = assigns.current_user
     |> Payments.latest_user_payments()
-    |> Enum.group_by(& DateTime.to_date(&1.completed_at))
+    |> Enum.group_by(& DateTime.to_date(&1.funded_at))
     |> Enum.reverse()
 
     stats = Payments.user_payment_stats(assigns.current_user)
@@ -54,9 +54,9 @@ defmodule NanopayWeb.App.DashboardLive do
                           <div class="flex-auto px-3 overflow-hidden">
                             <p class="text-sm font-medium text-gray-100 truncate"><%= payment.description %></p>
                             <time
-                              datetime={payment.completed_at}
+                              datetime={payment.funded_at}
                               class="text-sm text-gray-400">
-                              <%= Timex.format!(payment.completed_at, "{D} {Mfull} {YYYY}, {h24}:{m}") %>
+                              <%= Timex.format!(payment.funded_at, "{D} {Mfull} {YYYY}, {h24}:{m}") %>
                             </time>
                           </div>
                           <div class="flex-shrink-0">

@@ -24,7 +24,7 @@ defmodule Nanopay.Payments.PayRequest do
     field :amount, Money.Ecto.Composite.Type
     field :fee, Money.Ecto.Composite.Type
     field :base_rate, Money.Ecto.Composite.Type
-    field :completed_at, :utc_datetime
+    field :funded_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
   end
@@ -46,7 +46,7 @@ defmodule Nanopay.Payments.PayRequest do
   def status_changeset(pay_request, status) do
     pay_request
     |> change(%{status: status})
-    |> put_completed_at()
+    |> put_funded_at()
   end
 
   @doc """
@@ -160,11 +160,11 @@ defmodule Nanopay.Payments.PayRequest do
   defp put_money_fields(changes), do: changes
 
   # TODO
-  defp put_completed_at(changes) do
+  defp put_funded_at(changes) do
     case get_field(changes, :status) do
       :funded ->
         now = DateTime.utc_now() |> DateTime.truncate(:second)
-        put_change(changes, :completed_at, now)
+        put_change(changes, :funded_at, now)
       _ ->
         changes
     end

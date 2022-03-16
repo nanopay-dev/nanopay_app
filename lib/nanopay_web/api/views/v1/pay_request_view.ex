@@ -21,7 +21,7 @@ defmodule NanopayWeb.API.V1.PayRequestView do
         bip270_url: Routes.p2p_bip270_url(NanopayWeb.Endpoint, :show, pr.id)
       },
       created_at: pr.inserted_at,
-      completed_at: pr.completed_at
+      funded_at: pr.funded_at
     }
   end
 end

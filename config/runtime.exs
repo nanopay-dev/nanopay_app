@@ -84,8 +84,7 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 
   config :nanopay,
+    app_key: System.fetch_env!("APP_KEY"),
     coinbox_seed: System.fetch_env!("COINBOX_SEED"),
-    master_key: System.fetch_env!("MASTER_KEY"),
-    encryption_key: System.fetch_env!("ENCRYPTION_KEY"),
     paymail_host: System.get_env("PAYMAIL_HOST", "nanopay.cash")
 end

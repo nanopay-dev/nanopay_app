@@ -5,22 +5,22 @@ import { decrypt, encrypt, toKey, randBytes, sha256 } from '../util/crypto'
 
 /**
  * Appkey store
- * Contains the app master pubkey and a session key (if exists)
+ * Contains the app pubkey and a session key (if exists)
  */
 Alpine.store('appkey', {
-  masterPubKey: null,
+  appPubKey: null,
   sessionKey: null,
 
-  initialize(mpkey, skey) {
-    this.masterPubKey = mpkey
+  initialize(appkey, skey) {
+    this.appPubKey = appkey
     this.sessionKey = skey
   },
 
   /**
-   * Returns the master pubkey as a BSV pubkey
+   * Returns the app pubkey as a BSV pubkey
    */
-  getMasterPubKey() {
-    return PubKey.fromHex(this.masterPubKey)
+  getAppPubKey() {
+    return PubKey.fromHex(this.appPubKey)
   },
 
   /**
@@ -34,7 +34,7 @@ Alpine.store('appkey', {
    * Derives a new encryption pubkey from the master pubkey using the given path
    */
   async deriveEncryptionKey(path) {
-    const pubKey = this.getMasterPubKey()
+    const pubKey = this.getAppPubKey()
     const hash = await sha256(path)
     const s = Bn.fromBuffer(hash)
     const point = Point.getG().mul(s).add(pubKey.point)

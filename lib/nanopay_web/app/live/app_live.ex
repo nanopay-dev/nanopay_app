@@ -6,7 +6,7 @@ defmodule NanopayWeb.App.AppLive do
   alias BSV.{PrivKey, PubKey}
 
   def on_mount(:default, _params, session, socket) do
-    master_pubkey = Application.fetch_env!(:nanopay, :master_key)
+    app_pubkey = Application.fetch_env!(:nanopay, :app_key)
     |> PrivKey.from_wif!()
     |> PubKey.from_privkey()
     |> PubKey.to_binary(encoding: :hex)
@@ -19,7 +19,7 @@ defmodule NanopayWeb.App.AppLive do
     end
 
     socket = assign(socket, [
-      master_pubkey: master_pubkey,
+      app_pubkey: app_pubkey,
       current_user: Map.get(session, "current_user"),
       current_profile: profile,
       session_key: Map.get(session, "session_key")

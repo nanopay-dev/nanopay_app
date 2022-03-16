@@ -53,7 +53,7 @@ defmodule NanopayWeb.App.PaymentsLive do
           <%= if Enum.empty?(@payments.entries) do %>
             <.empty_state
               title="No payments"
-              subtitle="Get started by topping up your wallet."
+              subtitle="Payments to apps and services will be logged here."
               icon="receipt" />
           <% else %>
 

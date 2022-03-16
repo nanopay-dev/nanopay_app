@@ -21,7 +21,7 @@ export default {
    AppWrap: {
     mounted() {
       Alpine.store('appkey').initialize(
-        this.el.dataset.mkey,
+        this.el.dataset.akey,
         this.el.dataset.skey
       )
     }

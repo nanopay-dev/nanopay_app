@@ -61,8 +61,7 @@ config :ex_fontawesome, type: "solid"
 config :ex_money,
   default_cldr_backend: Nanopay.Cldr,
   exchange_rates_cache_module: Nanopay.Currency.RatesCache,
-  exchange_rates_retrieve_every: 36_000_000, #3600_000,
-  open_exchange_rates_app_id: "xXxXxXxXxXx"
+  exchange_rates_retrieve_every: 36_000_000 # 3_600_000
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -78,10 +77,6 @@ config :mime, :types, %{
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
-
-# Stripe config
-config :stripity_stripe,
-  api_key: "xXxXxXxXxXx"
 
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false

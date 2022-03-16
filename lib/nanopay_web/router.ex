@@ -124,7 +124,7 @@ defmodule NanopayWeb.Router do
   scope "/", NanopayWeb do
     pipe_through :browser
 
-    #get "/", PageController, :index
+    get "/", PageController, :index
   end
 
   scope "/" do

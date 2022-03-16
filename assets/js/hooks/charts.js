@@ -10,17 +10,17 @@ var formatter = new Intl.NumberFormat('en-US', {
 export const PaymentChart = {
   mounted() {
     const stats = JSON.parse(this.el.dataset.stats)
+
     const spendSeries = stats.map(s => {
-      return {
-        x: new Date(s.date).getTime(),
-        y: Number(s.amount)
-      }
+      const x = new Date(s.date).getTime()
+      const y = stats.some(s => Number(s.amount) > 0) ? Number(s.amount) : undefined;
+      return { x, y }
     })
+
     const paymentsSeries = stats.map(s => {
-      return {
-        x: new Date(s.date).getTime(),
-        y: Number(s.payments)
-      }
+      const x = new Date(s.date).getTime()
+      const y = stats.some(s => Number(s.payments) > 0) ? Number(s.payments) : undefined;
+      return { x, y }
     })
     
     this._chart = new ApexCharts(this.el, {

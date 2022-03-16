@@ -44,7 +44,7 @@ defmodule NanopayWeb.App.NotificationComponent do
             <button class="rounded-md inline-flex text-gray-600 hover:text-gray-500"
               @click="show = false">
               <span class="sr-only">Close</span>
-              <.icon name="times" class="fa w-5 h-5" />
+              <.icon name="xmark" class="fa w-5 h-5" />
             </button>
           </div>
         </div>
@@ -54,9 +54,9 @@ defmodule NanopayWeb.App.NotificationComponent do
   end
 
   # TODO
-  defp icon_type("success"), do: "check-circle"
-  defp icon_type("info"), do: "info-circle"
-  defp icon_type("error"), do: "exclamation-circle"
+  defp icon_type("success"), do: "circle-check"
+  defp icon_type("info"), do: "circle-info"
+  defp icon_type("error"), do: "circle-exclamation"
 
   # TODO
   defp icon_color("success"), do: "text-green-400"

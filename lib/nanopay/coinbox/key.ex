@@ -9,7 +9,6 @@ defmodule Nanopay.Coinbox.Key do
   alias Nanopay.Coinbox.{Coin}
   alias BSV.{Address, Contract, ExtKey, Hash, KeyPair, PrivKey, PubKey, Script, Sig, Tx, TxIn, TxOut}
 
-  @coinbox_seed Application.fetch_env!(:nanopay, :coinbox_seed)
   @crv Curvy.Curve.secp256k1()
 
   @doc """
@@ -98,7 +97,10 @@ defmodule Nanopay.Coinbox.Key do
   defp put_preimage_part(_any, preimage), do: preimage
 
   # Returns the wallet master key
-  defp master_key(), do: ExtKey.from_seed!(@coinbox_seed, encoding: :base64)
+  defp master_key() do
+    Application.fetch_env!(:nanopay, :coinbox_seed)
+    |> ExtKey.from_seed!(encoding: :base64)
+  end
 
   # Returns the key for the given channel
   defp channel_key(channel) when is_atom(channel) do

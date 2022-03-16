@@ -11,7 +11,8 @@ processes = []
 
 [env]
   PHX_ENV = "stage"
-  PHX_HOST = "nanopay-staging.fly.dev"
+  PHX_HOST = "stage.nanopay.cash"
+  PAYMAIL_HOST = "stage.nanopay.cash"
   PORT = "8080"
 
 [experimental]

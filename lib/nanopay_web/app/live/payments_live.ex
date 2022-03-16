@@ -85,7 +85,7 @@ defmodule NanopayWeb.App.PaymentsLive do
                       <td class="pl-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                         <%= live_patch to: Routes.app_payments_path(@socket, :show, payment.id),
                           class: "flex items-center justify-center h-9 w-9 text-gray-300 bg-white bg-opacity-5 hover:text-gray-100 hover:bg-opacity-20 rounded-full transition-colors" do %>
-                          <.icon name="search" class="fa h-4 w-4" />
+                          <.icon name="magnifying-glass" class="fa h-4 w-4" />
                         <% end %>
                       </td>
                     </tr>

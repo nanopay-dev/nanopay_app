@@ -76,7 +76,7 @@ defmodule NanopayWeb.App.DashboardLive do
           <div class="mt-6">
             <%= live_redirect to: Routes.app_payments_path(@socket, :index),
               class: "inline-flex items-center justify-center px-4 py-3 text-sm font-medium text-white text-opacity-80 bg-white bg-opacity-5 hover:text-opacity-100 hover:bg-opacity-10 rounded-md transition-colors" do %>
-              <.icon name="search" class="fa w-4 h-4 mr-2" />
+              <.icon name="magnifying-glass" class="fa w-4 h-4 mr-2" />
               View all payments
             <% end %>
           </div>
@@ -118,7 +118,7 @@ defmodule NanopayWeb.App.DashboardLive do
         <div class="bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg overflow-hidden shadow">
           <div class="flex items-center sm:flex-col sm:items-start lg:flex-row lg:items-center p-4 lg:px-8 lg:py-6">
             <div class="sm:mb-4 lg:-mb-0">
-              <.icon name="hand-holding-usd" family="regular" class="fa w-8 h-8 text-white text-opacity-75" />
+              <.icon name="hand-holding-dollar" family="regular" class="fa w-8 h-8 text-white text-opacity-75" />
             </div>
             <div class="flex-auto pl-4 sm:pl-0 lg:pl-8">
               <dt class="text-sm font-medium text-gray-100 truncate">Avg daily spend</dt>

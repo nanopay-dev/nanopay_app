@@ -39,10 +39,6 @@ export const pbkdf2 = async (data, salt, opts = {}) => {
   data = Buffer.from(data)
   salt = Buffer.from(salt)
 
-  console.log(crypto)
-  console.log(crypto.subtle)
-  console.log(crypto.subtle.importKey)
-
   const key = await crypto.subtle.importKey(
     'raw', data, 'PBKDF2', false, ['deriveBits']
   )

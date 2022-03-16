@@ -42,7 +42,7 @@ defmodule NanopayWeb.App.RegistrationLive do
             x_model: "handle.value" %>
           <template x-if="handle.blurred && handle.error">
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <.icon name="exclamation-triangle" class="fa w-5 h-5 text-red-400" />
+              <.icon name="triangle-exclamation" class="fa w-5 h-5 text-red-400" />
             </div>
           </template>
         </div>
@@ -67,7 +67,7 @@ defmodule NanopayWeb.App.RegistrationLive do
             x_model: "email.value" %>
           <template x-if="email.blurred && email.error">
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <.icon name="exclamation-triangle" class="fa w-5 h-5 text-red-400" />
+              <.icon name="triangle-exclamation" class="fa w-5 h-5 text-red-400" />
             </div>
           </template>
         </div>
@@ -92,7 +92,7 @@ defmodule NanopayWeb.App.RegistrationLive do
             x_model: "password.value" %>
           <template x-if="password.blurred && password.error">
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <.icon name="exclamation-triangle" class="fa w-5 h-5 text-red-400" />
+              <.icon name="triangle-exclamation" class="fa w-5 h-5 text-red-400" />
             </div>
           </template>
         </div>

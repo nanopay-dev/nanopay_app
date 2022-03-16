@@ -19,7 +19,7 @@ export const PaymentChart = {
     const paymentsSeries = stats.map(s => {
       return {
         x: new Date(s.date).getTime(),
-        y: s.payments
+        y: Number(s.payments)
       }
     })
     

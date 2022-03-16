@@ -7,7 +7,7 @@ defmodule NanopayWeb.App.SidebarComponent do
       name: "Main menu",
       links: [ %{
           name: "Dashboard",
-          icon: "columns",
+          icon: "table-columns",
           path: Routes.app_dashboard_path(NanopayWeb.Endpoint, :show),
           current: view == NanopayWeb.App.DashboardLive
         }, %{
@@ -136,7 +136,7 @@ defmodule NanopayWeb.App.SidebarComponent do
               class: "flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5"
             do %>
               <span class="inline-block w-4 mr-3 ">
-                <.icon name="cog" class="fa w-4 h-4" />
+                <.icon name="gear" class="fa w-4 h-4" />
               </span>
               Account settings
             <% end %>
@@ -161,7 +161,7 @@ defmodule NanopayWeb.App.SidebarComponent do
               class: "flex items-center px-4 py-2 text-sm text-white bg-white text-opacity-70 bg-opacity-0 hover:text-opacity-100 hover:bg-opacity-5"
             do %>
               <span class="inline-block w-4 mr-3 ">
-                <.icon name="sign-out-alt" class="fa w-4 h-4" />
+                <.icon name="arrow-right-from-bracket" class="fa w-4 h-4" />
               </span>
               Sign out
             <% end %>

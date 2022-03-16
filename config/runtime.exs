@@ -87,4 +87,10 @@ if config_env() == :prod do
     app_key: System.fetch_env!("APP_KEY"),
     coinbox_seed: System.fetch_env!("COINBOX_SEED"),
     paymail_host: System.get_env("PAYMAIL_HOST", "nanopay.cash")
+
+  config :ex_money,
+    open_exchange_rates_app_id: System.fetch_env!("OPEN_EXCHANGE_APP_ID")
+
+  config :stripity_stripe,
+    api_key: System.fetch_env!("STRIPE_API_KEY")
 end

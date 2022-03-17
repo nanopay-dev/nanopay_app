@@ -26,7 +26,6 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
     pay_request = Payments.get_pay_request(id)
     pay_method = List.first(pay_methods)
     pay_protocol = List.first(pay_method.protocols)
-    balance = FiatWallet.get_user_balance(assigns.current_user)
 
     # Subscribe to PR subsub
     channel = "pr:#{ pay_request.id }"
@@ -37,9 +36,17 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
       pay_request: pay_request,
       pay_methods: pay_methods,
       pay_method: pay_method,
-      pay_protocol: pay_protocol,
-      balance: balance
+      pay_protocol: pay_protocol
     ])
+
+    socket = case assigns.current_user do
+      %User{} ->
+        balance = FiatWallet.get_user_balance(assigns.current_user)
+        assign(socket, :balance, balance)
+      nil ->
+        socket
+    end
+
     {:ok, socket}
   end
 

@@ -54,7 +54,7 @@ defmodule NanopayWeb.P2P.Bip270View do
   defp merchant_data(_) do
     Jason.encode!(%{
       "avatarUrl" => Routes.static_url(NanopayWeb.Endpoint, "/images/app-icon.png"),
-      "merchantName" => "Paypresto"
+      "merchantName" => "Nanopay"
     })
   end
 

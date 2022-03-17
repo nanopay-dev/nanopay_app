@@ -1,8 +1,8 @@
+@import url('https://rsms.me/inter/inter.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* @import url('https://rsms.me/inter/inter.css'); */
 
 /* This file is for your main application CSS */
 

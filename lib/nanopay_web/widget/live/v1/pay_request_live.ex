@@ -312,7 +312,7 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
               class="inline-flex items-center ml-2 text-xs font-medium text-blue-400 hover:text-pink-400 transition-colors cursor-pointer"
               x-show="isMobile"
               @click="openUrl()">
-              <.icon name="external-link-alt" class="fa h-3 w-3 mr-1" />
+              <.icon name="arrow-up-right-from-square" class="fa h-3 w-3 mr-1" />
               <span>Open</span>
             </a>
 

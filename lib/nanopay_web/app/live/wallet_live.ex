@@ -252,7 +252,7 @@ defmodule NanopayWeb.App.WalletLive do
             target="_blank"
             class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
             <%= trunc_txid(@subject.used_coin.spending_txid) %>
-            <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
+            <.icon name="arrow-up-right-from-square" class="fa w-3 h-3 ml-1" />
           </a>
         </td>
       </tr>
@@ -264,7 +264,7 @@ defmodule NanopayWeb.App.WalletLive do
             target="_blank"
             class="inline-flex items-start font-mono text-blue-400 hover:text-pink-400 transition-colors">
             <%= @address %>
-            <.icon name="external-link-alt" class="fa w-3 h-3 ml-1" />
+            <.icon name="arrow-up-right-from-square" class="fa w-3 h-3 ml-1" />
           </a>
         </td>
       </tr>

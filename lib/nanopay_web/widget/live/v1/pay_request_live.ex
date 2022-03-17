@@ -36,7 +36,8 @@ defmodule NanopayWeb.Widget.V1.PayRequestLive do
       pay_request: pay_request,
       pay_methods: pay_methods,
       pay_method: pay_method,
-      pay_protocol: pay_protocol
+      pay_protocol: pay_protocol,
+      balance: Money.new(:USD, "0")
     ])
 
     socket = case assigns.current_user do

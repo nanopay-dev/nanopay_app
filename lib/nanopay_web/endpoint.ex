@@ -7,17 +7,19 @@ defmodule NanopayWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_nanopay_key",
-    signing_salt: "YUR9xszg"
-  ]
-
-  @liveview_session_options Keyword.merge(@session_options, [
+    signing_salt: "YUR9xszg",
     same_site: "None",
     secure: true
-  ])
+  ]
+
+  #@liveview_session_options Keyword.merge(@session_options, [
+  #  same_site: "None",
+  #  secure: true
+  #])
 
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [
-      connect_info: [session: @liveview_session_options]
+      connect_info: [session: @session_options]
     ]
 
   # Disable CORS for api and p2p routes

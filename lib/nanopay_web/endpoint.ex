@@ -12,11 +12,6 @@ defmodule NanopayWeb.Endpoint do
     secure: true
   ]
 
-  #@liveview_session_options Keyword.merge(@session_options, [
-  #  same_site: "None",
-  #  secure: true
-  #])
-
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [
       connect_info: [session: @session_options]
